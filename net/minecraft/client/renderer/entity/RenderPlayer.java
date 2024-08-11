@@ -91,7 +91,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
                 modelplayer.heldItemRight = 1;
 
                 // KA third person block animations
-                boolean flag = clientPlayer instanceof EntityPlayerSP && KillAura.blocking;
+                boolean flag = clientPlayer instanceof EntityPlayerSP && KillAura.fakeab;
                 if (flag || clientPlayer.getItemInUseCount() > 0) {
                     EnumAction enumaction = itemstack.getItemUseAction();
 

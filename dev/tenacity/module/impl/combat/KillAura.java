@@ -21,6 +21,8 @@ import dev.tenacity.utils.render.RenderUtil;
 import dev.tenacity.utils.server.PacketUtils;
 import dev.tenacity.utils.time.TimerUtil;
 import dev.tenacity.viamcp.utils.AttackOrder;
+import kotlin.jvm.JvmField;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
@@ -47,6 +49,7 @@ public final class KillAura extends Module {
     public static boolean attacking;
     public static boolean blocking;
     public static boolean wasBlocking;
+    public static boolean fakeab;
     private float yaw = 0;
     private int cps;
     public static EntityLivingBase target;
@@ -70,9 +73,9 @@ public final class KillAura extends Module {
     private final NumberSetting maxCPS = new NumberSetting("Max CPS", 10, 20, 1, 1);
     private final NumberSetting reach = new NumberSetting("Reach", 4, 6, 3, 0.1);
 
-    private final BooleanSetting autoblock = new BooleanSetting("Autoblock", false);
+    public BooleanSetting autoblock = new BooleanSetting("Autoblock", false);
 
-    private final ModeSetting autoblockMode = new ModeSetting("Autoblock Mode", "Watchdog", "Fake", "Verus", "Watchdog", "HighVersion");
+    public final ModeSetting autoblockMode = new ModeSetting("Autoblock Mode", "Watchdog", "Fake", "Verus", "Watchdog", "HighVersion");
 
     private final BooleanSetting rotations = new BooleanSetting("Rotations", true);
     private final ModeSetting rotationMode = new ModeSetting("Rotation Mode", "Vanilla", "Vanilla", "Smooth","LockView");
@@ -91,6 +94,9 @@ public final class KillAura extends Module {
             new BooleanSetting("Tracer", false),
             new BooleanSetting("Box", false),
             new BooleanSetting("Custom Color", false));
+
+    private final BooleanSetting debug = new BooleanSetting("Debug",false);
+
     private final ColorSetting customColor = new ColorSetting("Custom Color", Color.WHITE);
     private EntityLivingBase auraESPTarget;
 
@@ -102,7 +108,7 @@ public final class KillAura extends Module {
         maxTargetAmount.addParent(mode, m -> mode.is("Multi"));
         customColor.addParent(auraESP, r -> r.isEnabled("Custom Color"));
         this.addSettings(targetsSetting, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
-                rotations, rotationMode, sortMode, addons, auraESP, customColor);
+                rotations, rotationMode, sortMode,debug, addons, auraESP, customColor);
     }
 
     @Override
@@ -184,13 +190,6 @@ public final class KillAura extends Module {
 
         if (blocking) {
             switch (autoblockMode.getMode()) {
-                case "WatchDog":
-                    if (event.isPre() && wasBlocking) {
-                        ChatUtil.print(true,"C09");
-                        mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
-                        mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                    }
-                    break;
                 case "Verus":
                     if (event.isPre()) {
                         if (wasBlocking) {
@@ -266,21 +265,25 @@ public final class KillAura extends Module {
 
     @Override
     public void onUpdateEvent(UpdateEvent event) {
-        if (autoblock.isEnabled()) {
+        fakeab = autoblockMode.is("Fake") && blocking;
+        if (autoblock.isEnabled() && !autoblockMode.is("Fake")) {
             if (mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
                 if (autoblockMode.is("WatchDog") && wasBlocking) {
-                    ChatUtil.print(true,"C09");
+                    if (debug.isEnabled()) ChatUtil.print(true,"C09");
+
                     PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
-                    mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 }
                 if (!wasBlocking && target != null) {
-                    ChatUtil.print(true, "Block");
-                    mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
+                    if (debug.isEnabled()) ChatUtil.print(true, "Block");
+
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),true);
                     wasBlocking = true;
                 }
                 if (target == null && wasBlocking) {
-                    ChatUtil.print(true, "UnBlock");
-                    mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    if (debug.isEnabled()) ChatUtil.print(true, "UnBlock");
+
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),false);
                     wasBlocking = false;
                 }
             }

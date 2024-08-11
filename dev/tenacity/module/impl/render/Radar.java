@@ -17,6 +17,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -144,7 +145,7 @@ public class Radar extends Module {
                 }
             }
 
-            if ((entity instanceof EntityMob || entity instanceof EntityWaterMob) && targets.getSetting("Mobs").isEnabled()) {
+            if ((entity instanceof EntityMob || entity instanceof EntityWaterMob || entity instanceof EntitySlime) && targets.getSetting("Mobs").isEnabled()) {
                 entities.add(entity);
             }
 
