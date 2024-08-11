@@ -22,7 +22,9 @@ import dev.tenacity.utils.server.PacketUtils;
 import dev.tenacity.utils.time.TimerUtil;
 import dev.tenacity.viamcp.utils.AttackOrder;
 import kotlin.jvm.JvmField;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,7 +32,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.*;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -67,7 +69,8 @@ public final class KillAura extends Module {
 
     private final MultipleBoolSetting ban = new MultipleBoolSetting("Ban",
             new BooleanSetting("Eating",false),
-            new BooleanSetting("Inventory",false)
+            new BooleanSetting("Inventory",false),
+            new BooleanSetting("Chest",false)
             );
 
     private final ModeSetting mode = new ModeSetting("Mode", "Single", "Single", "Multi");
@@ -113,7 +116,7 @@ public final class KillAura extends Module {
         switchDelay.addParent(mode, m -> mode.is("Switch"));
         maxTargetAmount.addParent(mode, m -> mode.is("Multi"));
         customColor.addParent(auraESP, r -> r.isEnabled("Custom Color"));
-        this.addSettings(targetsSetting, mode,ban, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
+        this.addSettings(targetsSetting,ban, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
                 rotations, rotationMode, sortMode,debug, addons, auraESP, customColor);
     }
 
@@ -125,6 +128,8 @@ public final class KillAura extends Module {
         blocking = false;
         attacking = false;
         if(wasBlocking) {
+            wasBlocking = false;
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),false);
             PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
         }
         wasBlocking = false;
@@ -133,11 +138,16 @@ public final class KillAura extends Module {
 
     @Override
     public void onMotionEvent(MotionEvent event) {
-        if (cancel()) {
-            target = null;
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),false);
-        }
         this.setSuffix(mode.getMode());
+        if (cancel()) {
+            if (wasBlocking) {
+                wasBlocking = false;
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
+            }
+            targets.clear();
+            target = null;
+            return;
+        }
 
         if(minCPS.getValue() > maxCPS.getValue()) {
             minCPS.setValue(minCPS.getValue() - 1);
@@ -325,10 +335,16 @@ public final class KillAura extends Module {
     private final Animation auraESPAnim = new DecelerateAnimation(300, 1);
 
     public boolean cancel() {
-        if (ban.getSetting("Inventory").isEnabled() && mc.currentScreen instanceof GuiContainer) {
+        ItemStack item = mc.thePlayer.getHeldItem();
+        if (ban.getSetting("Inventory").isEnabled() && mc.currentScreen instanceof GuiInventory) {
             return true;
         }
-        if (ban.getSetting("Eating").isEnabled() && mc.thePlayer.isUsingItem() && !mc.thePlayer.isBlocking()) {
+
+        if (ban.getSetting("Eating").isEnabled() && mc.thePlayer.isUsingItem() && (item.getItem() instanceof ItemFood || item.getItem() instanceof ItemPotion || item.getItem() instanceof ItemBucketMilk)) {
+            return true;
+        }
+
+        if (ban.getSetting("Chest").isEnabled() && mc.currentScreen instanceof GuiChest) {
             return true;
         }
         return false;

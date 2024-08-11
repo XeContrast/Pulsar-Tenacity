@@ -52,6 +52,7 @@ class Speed : Module("Speed", Category.MOVEMENT, "Makes you go faster") {
     private val verusMode = ModeSetting("Verus Mode", "Normal", "Low", "Normal")
     private val viperMode = ModeSetting("Viper Mode", "Normal", "High", "Normal")
     private val autoDisable = BooleanSetting("Auto Disable", false)
+    private val hypstrafe = BooleanSetting("Strafe",false)
     private val groundSpeed = NumberSetting("Ground Speed", 2.0, 5.0, 1.0, 0.1)
     private val timer = NumberSetting("Timer", 1.0, 5.0, 1.0, 0.1)
     private val vanillaSpeed = NumberSetting("Speed", 1.0, 10.0, 1.0, 0.1)
@@ -74,13 +75,21 @@ class Speed : Module("Speed", Category.MOVEMENT, "Makes you go faster") {
         viperMode.addParent(mode) { modeSetting: ModeSetting -> modeSetting.`is`("Viper") }
         groundSpeed.addParent(watchdogMode) { modeSetting: ModeSetting -> modeSetting.`is`("Ground") && mode.`is`("WatchDog") }
         vanillaSpeed.addParent(mode) { modeSetting: ModeSetting -> modeSetting.`is`("Vanilla") || modeSetting.`is`("BHop") }
-        this.addSettings(mode, vanillaSpeed, watchdogMode, verusMode, viperMode, autoDisable, groundSpeed, timer)
+        hypstrafe.addParent(watchdogMode) { modeSetting: ModeSetting -> modeSetting.`is`("New") && mode.`is`("WatchDog")}
+        this.addSettings(mode, vanillaSpeed, watchdogMode, verusMode, viperMode, autoDisable,hypstrafe, groundSpeed, timer)
     }
 
     override fun onUpdateEvent(event: UpdateEvent?) {
         if (mode.`is`("WatchDog")) {
             if (watchdogMode.`is`("New")) {
-                if (mc.thePlayer.onGround && MovementUtils.isMoving) {
+                if (hypstrafe.isEnabled) {
+                    if (!mc.thePlayer.onGround) {
+                        if (MovementUtils.speed <= 0.17) {
+                            strafe(0.17f)
+                        }
+                    }
+                }
+                if (mc.thePlayer.onGround && isMoving) {
                     mc.thePlayer.jump()
                     if (!mc.thePlayer.isUsingItem) {
                         strafe(0.4f)
