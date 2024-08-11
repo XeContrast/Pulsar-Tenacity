@@ -14,6 +14,7 @@ import dev.tenacity.utils.animations.Animation;
 import dev.tenacity.utils.animations.Direction;
 import dev.tenacity.utils.animations.impl.DecelerateAnimation;
 import dev.tenacity.utils.misc.MathUtils;
+import dev.tenacity.utils.player.ChatUtil;
 import dev.tenacity.utils.player.InventoryUtils;
 import dev.tenacity.utils.player.RotationUtils;
 import dev.tenacity.utils.render.RenderUtil;
@@ -185,7 +186,7 @@ public final class KillAura extends Module {
             switch (autoblockMode.getMode()) {
                 case "WatchDog":
                     if (event.isPre() && wasBlocking) {
-                        System.out.println("C09");
+                        ChatUtil.print(true,"C09");
                         mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
                         mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                     }
@@ -266,21 +267,22 @@ public final class KillAura extends Module {
     @Override
     public void onUpdateEvent(UpdateEvent event) {
         if (autoblock.isEnabled()) {
-            if (wasBlocking) {
-                System.out.println("C09");
-                mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
-                mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-            }
-            if (!wasBlocking && target != null) {
-                mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
-                wasBlocking = true;
-            }
-            if (target == null && wasBlocking) {
-                if (!(mc.thePlayer.getHeldItem().getItem() instanceof ItemSword)) {
-                    return;
+            if (mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
+                if (autoblockMode.is("WatchDog") && wasBlocking) {
+                    ChatUtil.print(true,"C09");
+                    mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
+                    mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 }
-                mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                wasBlocking = false;
+                if (!wasBlocking && target != null) {
+                    ChatUtil.print(true, "Block");
+                    mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
+                    wasBlocking = true;
+                }
+                if (target == null && wasBlocking) {
+                    ChatUtil.print(true, "UnBlock");
+                    mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    wasBlocking = false;
+                }
             }
         }
     }

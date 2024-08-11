@@ -1,8 +1,12 @@
 package dev.tenacity.module.settings;
 
 import dev.tenacity.module.settings.impl.BooleanSetting;
+import net.minecraft.util.ChatComponentText;
 
+import java.util.Arrays;
 import java.util.function.Predicate;
+
+import static dev.tenacity.utils.misc.MinecraftInstance.mc;
 
 public class ParentAttribute<T extends Setting> {
 

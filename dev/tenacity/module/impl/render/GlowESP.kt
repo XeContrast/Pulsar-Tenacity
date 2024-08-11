@@ -29,7 +29,6 @@ import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL14
 import org.lwjgl.opengl.GL20
 import java.awt.Color
-import java.lang.Math.pow
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -412,11 +411,10 @@ class GlowESP : Module("GlowESP", Category.RENDER, "ESP that glows on players") 
             }
         }
         if (entity is EntityLivingBase) {
-            val entityLivingBase = entity
-            if (entityLivingBase.hurtTime > 0) {
+            if (entity.hurtTime > 0) {
                 //We use a the first part of the sine wave to make the color more red as the entity gets hurt and animate it back to normal
                 color = ColorUtil.interpolateColorC(
-                    color, hurtTimeColor.color, sin(entityLivingBase.hurtTime * (18 * Math.PI / 180))
+                    color, hurtTimeColor.color, sin(entity.hurtTime * (18 * Math.PI / 180))
                         .toFloat()
                 )
             }

@@ -18,6 +18,7 @@ import dev.tenacity.utils.animations.impl.DecelerateAnimation;
 import dev.tenacity.utils.misc.Multithreading;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.util.ChatComponentText;
 import org.lwjgl.input.Keyboard;
 import store.intent.intentguard.annotation.Exclude;
 import store.intent.intentguard.annotation.Strategy;
@@ -235,5 +236,4 @@ public class Module extends ListenerAdapter implements Utils {
         }
         return null;
     }
-
 }

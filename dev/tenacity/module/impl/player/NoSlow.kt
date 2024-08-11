@@ -1,11 +1,13 @@
 package dev.tenacity.module.impl.player
 
+import dev.tenacity.Tenacity
 import dev.tenacity.event.impl.player.MotionEvent
 import dev.tenacity.event.impl.player.SlowDownEvent
 import dev.tenacity.module.Category
 import dev.tenacity.module.Module
 import dev.tenacity.module.impl.combat.KillAura
 import dev.tenacity.module.settings.impl.ModeSetting
+import dev.tenacity.utils.player.ChatUtil
 import dev.tenacity.utils.player.MovementUtils.isMoving
 import dev.tenacity.utils.server.PacketUtils
 import net.minecraft.item.ItemBucketMilk
@@ -15,6 +17,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
+import tv.twitch.chat.Chat
 
 class NoSlow : Module("NoSlow", Category.PLAYER, "prevent item slowdown") {
     private val mode = ModeSetting("Mode", "Watchdog", "Vanilla", "NCP", "WatchDog")
@@ -48,7 +51,7 @@ class NoSlow : Module("NoSlow", Category.PLAYER, "prevent item slowdown") {
 
                         if (getEmptySlot() != -1) {
                             if (mc.thePlayer.ticksExisted % 3 == 0) {
-                                print("C08")
+                                ChatUtil.print(true,"C08")
                                 PacketUtils.sendPacketNoEvent(
                                     C08PacketPlayerBlockPlacement(
                                         BlockPos(-1, -1, -1),
