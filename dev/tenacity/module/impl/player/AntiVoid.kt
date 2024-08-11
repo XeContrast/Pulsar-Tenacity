@@ -1,74 +1,70 @@
-package dev.tenacity.module.impl.player;
+package dev.tenacity.module.impl.player
 
-import dev.tenacity.Tenacity;
-import dev.tenacity.event.impl.network.PacketSendEvent;
-import dev.tenacity.module.Category;
-import dev.tenacity.module.Module;
-import dev.tenacity.module.impl.movement.Speed;
-import dev.tenacity.module.settings.impl.ModeSetting;
-import dev.tenacity.module.settings.impl.NumberSetting;
-import dev.tenacity.utils.server.PacketUtils;
-import dev.tenacity.utils.time.TimerUtil;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.util.AxisAlignedBB;
+import dev.tenacity.Tenacity
+import dev.tenacity.event.impl.network.PacketSendEvent
+import dev.tenacity.module.Category
+import dev.tenacity.module.Module
+import dev.tenacity.module.impl.movement.Speed
+import dev.tenacity.module.settings.impl.ModeSetting
+import dev.tenacity.module.settings.impl.NumberSetting
+import dev.tenacity.utils.server.PacketUtils
+import dev.tenacity.utils.time.TimerUtil
+import net.minecraft.network.Packet
+import net.minecraft.network.play.client.C03PacketPlayer
+import java.util.function.Consumer
 
-import java.util.ArrayList;
-import java.util.List;
+class AntiVoid : Module("AntiVoid", Category.PLAYER, "saves you from the void") {
+    private val mode = ModeSetting("Mode", "Watchdog", "Watchdog")
+    private val fallDist = NumberSetting("Fall Distance", 3.0, 20.0, 1.0, 0.5)
+    private val timer = TimerUtil()
+    private val reset = false
+    private var lastGroundY = 0.0
 
-public class AntiVoid extends Module {
+    private val packets: MutableList<Packet<*>> = ArrayList()
 
-    private final ModeSetting mode = new ModeSetting("Mode", "Watchdog", "Watchdog");
-    private final NumberSetting fallDist = new NumberSetting("Fall Distance", 3, 20, 1, 0.5);
-    private final TimerUtil timer = new TimerUtil();
-    private boolean reset;
-    private double lastGroundY;
-
-    private final List<Packet> packets = new ArrayList<>();
-
-    public AntiVoid() {
-        super("AntiVoid", Category.PLAYER, "saves you from the void");
-        this.addSettings(mode, fallDist);
+    init {
+        this.addSettings(mode, fallDist)
     }
 
-    @Override
-    public void onPacketSendEvent(PacketSendEvent event) {
-        if(mode.is("Watchdog") && !Tenacity.INSTANCE.getModuleCollection().getModule(Speed.class).isEnabled()) {
-            if(event.getPacket() instanceof C03PacketPlayer) {
-                if(!isBlockUnder()) {
-                    if(mc.thePlayer.fallDistance < fallDist.getValue()) {
-                        event.cancel();
-                        packets.add(event.getPacket());
+    override fun onPacketSendEvent(event: PacketSendEvent) {
+        if (mode.`is`("Watchdog") && !Tenacity.INSTANCE.moduleCollection.getModule(Speed::class.java).isEnabled) {
+            if (event.packet is C03PacketPlayer) {
+                if (!isBlockUnder) {
+                    if (mc.thePlayer.fallDistance < fallDist.value) {
+                        event.cancel()
+                        packets.add(event.packet)
                     } else {
-                        if(!packets.isEmpty()) {
-                            for(Packet packet : packets) {
-                                final C03PacketPlayer c03 = (C03PacketPlayer) packet;
-                                c03.setY(lastGroundY);
-                                PacketUtils.sendPacketNoEvent(packet);
+                        if (packets.isNotEmpty()) {
+                            for (packet in packets) {
+                                val c03 = packet as C03PacketPlayer
+                                c03.setY(lastGroundY)
+                                PacketUtils.sendPacketNoEvent(packet)
                             }
-                            packets.clear();
+                            packets.clear()
                         }
                     }
                 } else {
-                    lastGroundY = mc.thePlayer.posY;
-                    if(!packets.isEmpty()) {
-                        packets.forEach(PacketUtils::sendPacketNoEvent);
-                        packets.clear();
+                    lastGroundY = mc.thePlayer.posY
+                    if (packets.isNotEmpty()) {
+                        packets.forEach(Consumer { packet: Packet<*>? -> PacketUtils.sendPacketNoEvent(packet) })
+                        packets.clear()
                     }
                 }
             }
         }
     }
 
-    private boolean isBlockUnder() {
-        if (mc.thePlayer.posY < 0) return false;
-        for (int offset = 0; offset < (int) mc.thePlayer.posY + 2; offset += 2) {
-            AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0, -offset, 0);
-            if (!mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isEmpty()) {
-                return true;
+    private val isBlockUnder: Boolean
+        get() {
+            if (mc.thePlayer.posY < 0) return false
+            var offset = 0
+            while (offset < mc.thePlayer.posY.toInt() + 2) {
+                val bb = mc.thePlayer.entityBoundingBox.offset(0.0, -offset.toDouble(), 0.0)
+                if (mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isNotEmpty()) {
+                    return true
+                }
+                offset += 2
             }
+            return false
         }
-        return false;
-    }
-
 }

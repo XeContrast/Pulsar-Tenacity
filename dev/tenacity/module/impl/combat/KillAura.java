@@ -270,7 +270,7 @@ public final class KillAura extends Module {
             if (mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
                 if (autoblockMode.is("WatchDog") && wasBlocking) {
                     ChatUtil.print(true,"C09");
-                    mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
+                    PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
                     mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 }
                 if (!wasBlocking && target != null) {

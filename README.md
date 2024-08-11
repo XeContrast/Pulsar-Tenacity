@@ -1,2 +1,3 @@
 # Pulsar
-by -Xebook1, Xiaozhuhou233
+Main Dev is -Xebook1
+secondary Dev is xiaohouzhu233
