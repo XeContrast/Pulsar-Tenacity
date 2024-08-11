@@ -178,6 +178,13 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
                     )
                 )
             }
+            if (sprint.isEnabled && sprintMode.`is`("Jumpsprint") && mc.thePlayer.onGround&&isMoving ) {
+                if (mc.gameSettings.keyBindJump.isKeyDown) {
+                    mc.thePlayer.isSprinting = true
+                }else{
+                    mc.thePlayer.isSprinting = false
+                }
+            }
 
             // Rotations
             if (rotations.isEnabled) {
@@ -607,7 +614,7 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
     companion object {
         @JvmField
         var keepYMode: ModeSetting = ModeSetting("Keep Y Mode", "Always", "Always", "Speed toggled","WatchDog")
-        var sprintMode: ModeSetting = ModeSetting("Sprint Mode", "Vanilla", "Vanilla", "Watchdog", "Cancel")
+        var sprintMode: ModeSetting = ModeSetting("Sprint Mode", "Vanilla", "Vanilla", "Watchdog", "Cancel","Jumpsprint")
         var towerMode: ModeSetting = ModeSetting("Tower Mode", "Watchdog", "Vanilla", "NCP", "Watchdog", "Verus")
         var swingMode: ModeSetting = ModeSetting("Swing Mode", "Client", "Client", "Silent")
         var delay: NumberSetting = NumberSetting("Delay", 0.0, 2.0, 0.0, 0.05)
