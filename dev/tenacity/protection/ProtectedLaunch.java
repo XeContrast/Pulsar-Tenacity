@@ -16,7 +16,6 @@ import dev.tenacity.module.impl.combat.*;
 import dev.tenacity.module.impl.exploit.*;
 import dev.tenacity.module.impl.misc.*;
 import dev.tenacity.module.impl.movement.*;
-import dev.tenacity.module.impl.player.Timer;
 import dev.tenacity.module.impl.player.*;
 import dev.tenacity.module.impl.render.*;
 import dev.tenacity.module.impl.render.killeffects.KillEffects;
@@ -31,11 +30,9 @@ import dev.tenacity.utils.render.Theme;
 import dev.tenacity.utils.server.PingerUtils;
 import dev.tenacity.viamcp.ViaMCP;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.main.Main;
 import store.intent.intentguard.annotation.Bootstrap;
 import store.intent.intentguard.annotation.Native;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,11 +83,13 @@ public class ProtectedLaunch {
         modules.put(AutoAuthenticate.class, new AutoAuthenticate());
         modules.put(Killsults.class, new Killsults());
         modules.put(Sniper.class, new Sniper());
-        modules.put(ViaVersionFix.class,new ViaVersionFix());
+        modules.put(ViaVersionFix.class, new ViaVersionFix());
 
         // Movement
         modules.put(Sprint.class, new Sprint());
         modules.put(Scaffold.class, new Scaffold());
+        modules.put(Spider.class, new Spider());
+        modules.put(StrafeFix.class, new StrafeFix());
         modules.put(Speed.class, new Speed());
         modules.put(Flight.class, new Flight());
         modules.put(LongJump.class, new LongJump());
@@ -99,7 +98,7 @@ public class ProtectedLaunch {
         modules.put(FastLadder.class, new FastLadder());
         modules.put(InventoryMove.class, new InventoryMove());
         modules.put(Jesus.class, new Jesus());
-        modules.put(Spider.class, new Spider());
+
         modules.put(AutoHeadHitter.class, new AutoHeadHitter());
 
         // Player

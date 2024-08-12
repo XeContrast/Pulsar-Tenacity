@@ -2,7 +2,6 @@ package dev.tenacity.module.impl.combat;
 
 import dev.tenacity.Tenacity;
 import dev.tenacity.commands.impl.FriendCommand;
-import dev.tenacity.event.impl.network.PacketSendEvent;
 import dev.tenacity.event.impl.player.*;
 import dev.tenacity.event.impl.render.Render3DEvent;
 import dev.tenacity.module.Category;
@@ -21,9 +20,7 @@ import dev.tenacity.utils.render.RenderUtil;
 import dev.tenacity.utils.server.PacketUtils;
 import dev.tenacity.utils.time.TimerUtil;
 import dev.tenacity.viamcp.utils.AttackOrder;
-import kotlin.jvm.JvmField;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
@@ -36,16 +33,13 @@ import net.minecraft.item.*;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import java.awt.*;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public final class KillAura extends Module {
 
@@ -65,13 +59,13 @@ public final class KillAura extends Module {
             new BooleanSetting("Mobs", false),
             new BooleanSetting("Animals", false),
             new BooleanSetting("Invisibles", false),
-            new BooleanSetting("Death",false));
+            new BooleanSetting("Death", false));
 
     private final MultipleBoolSetting ban = new MultipleBoolSetting("Ban",
-            new BooleanSetting("Eating",false),
-            new BooleanSetting("Inventory",false),
-            new BooleanSetting("Chest",false)
-            );
+            new BooleanSetting("Eating", false),
+            new BooleanSetting("Inventory", false),
+            new BooleanSetting("Chest", false)
+    );
 
     private final ModeSetting mode = new ModeSetting("Mode", "Single", "Single", "Multi");
 
@@ -87,7 +81,7 @@ public final class KillAura extends Module {
     public final ModeSetting autoblockMode = new ModeSetting("Autoblock Mode", "Watchdog", "Fake", "Verus", "Watchdog", "HighVersion");
 
     private final BooleanSetting rotations = new BooleanSetting("Rotations", true);
-    private final ModeSetting rotationMode = new ModeSetting("Rotation Mode", "Vanilla", "Vanilla", "Smooth","LockView");
+    private final ModeSetting rotationMode = new ModeSetting("Rotation Mode", "Vanilla", "Vanilla", "Smooth", "LockView");
 
     private final ModeSetting sortMode = new ModeSetting("Sort Mode", "Range", "Range", "Hurt Time", "Health", "Armor");
 
@@ -104,7 +98,7 @@ public final class KillAura extends Module {
             new BooleanSetting("Box", false),
             new BooleanSetting("Custom Color", false));
 
-    private final BooleanSetting debug = new BooleanSetting("Debug",false);
+    private final BooleanSetting debug = new BooleanSetting("Debug", false);
 
     private final ColorSetting customColor = new ColorSetting("Custom Color", Color.WHITE);
     private EntityLivingBase auraESPTarget;
@@ -116,8 +110,8 @@ public final class KillAura extends Module {
         switchDelay.addParent(mode, m -> mode.is("Switch"));
         maxTargetAmount.addParent(mode, m -> mode.is("Multi"));
         customColor.addParent(auraESP, r -> r.isEnabled("Custom Color"));
-        this.addSettings(targetsSetting,ban, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
-                rotations, rotationMode, sortMode,debug, addons, auraESP, customColor);
+        this.addSettings(targetsSetting, ban, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
+                rotations, rotationMode, sortMode, debug, addons, auraESP, customColor);
     }
 
     @Override
@@ -127,9 +121,9 @@ public final class KillAura extends Module {
         targets.clear();
         blocking = false;
         attacking = false;
-        if(wasBlocking) {
+        if (wasBlocking) {
             wasBlocking = false;
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),false);
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
             PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
         }
         wasBlocking = false;
@@ -149,7 +143,7 @@ public final class KillAura extends Module {
             return;
         }
 
-        if(minCPS.getValue() > maxCPS.getValue()) {
+        if (minCPS.getValue() > maxCPS.getValue()) {
             minCPS.setValue(minCPS.getValue() - 1);
         }
 
@@ -177,15 +171,15 @@ public final class KillAura extends Module {
                     RotationUtils.setVisualRotations(event.getYaw(), event.getPitch());
                 }
 
-                if(addons.getSetting("Ray Cast").isEnabled() && !RotationUtils.isMouseOver(event.getYaw(), event.getPitch(), target, reach.getValue().floatValue()))
+                if (addons.getSetting("Ray Cast").isEnabled() && !RotationUtils.isMouseOver(event.getYaw(), event.getPitch(), target, reach.getValue().floatValue()))
                     return;
 
                 if (attackTimer.hasTimeElapsed(cps, true)) {
                     final int maxValue = (int) ((minCPS.getMaxValue() - maxCPS.getValue()) * 20);
                     final int minValue = (int) ((minCPS.getMaxValue() - minCPS.getValue()) * 20);
                     cps = MathUtils.getRandomInRange(minValue, maxValue);
-                    if(mode.is("Multi")) {
-                        for(EntityLivingBase entityLivingBase : targets) {
+                    if (mode.is("Multi")) {
+                        for (EntityLivingBase entityLivingBase : targets) {
                             AttackEvent attackEvent = new AttackEvent(entityLivingBase);
                             Tenacity.INSTANCE.getEventProtocol().handleEvent(attackEvent);
 
@@ -277,8 +271,7 @@ public final class KillAura extends Module {
             if ((entity instanceof EntityMob || entity instanceof EntitySlime) && targetsSetting.getSetting("Mobs").isEnabled())
                 return true;
 
-            if (entity.isInvisible() && targetsSetting.getSetting("Invisibles").isEnabled())
-                return true;
+            return entity.isInvisible() && targetsSetting.getSetting("Invisibles").isEnabled();
         }
 
         return false;
@@ -290,7 +283,7 @@ public final class KillAura extends Module {
         if (autoblock.isEnabled() && !autoblockMode.is("Fake")) {
             if (mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
                 if (autoblockMode.is("WatchDog") && wasBlocking) {
-                    if (debug.isEnabled()) ChatUtil.print(true,"C09");
+                    if (debug.isEnabled()) ChatUtil.print(true, "C09");
 
                     PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange((mc.thePlayer.inventory.currentItem + 1) % 9));
                     PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
@@ -298,13 +291,13 @@ public final class KillAura extends Module {
                 if (!wasBlocking && target != null) {
                     if (debug.isEnabled()) ChatUtil.print(true, "Block");
 
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),true);
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), true);
                     wasBlocking = true;
                 }
                 if (target == null && wasBlocking) {
                     if (debug.isEnabled()) ChatUtil.print(true, "UnBlock");
 
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(),false);
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
                     wasBlocking = false;
                 }
             }
@@ -313,21 +306,23 @@ public final class KillAura extends Module {
 
     @Override
     public void onPlayerMoveUpdateEvent(PlayerMoveUpdateEvent event) {
-        if(addons.getSetting("Movement Fix").isEnabled() && target != null){
-            event.setYaw(yaw);
+        if (addons.getSetting("Movement Fix").isEnabled() && target != null) {
+            //event.setYaw(yaw);//
+            event.yaw = yaw;
         }
     }
 
     @Override
     public void onJumpFixEvent(JumpFixEvent event) {
-        if(addons.getSetting("Movement Fix").isEnabled() && target != null){
-            event.setYaw(yaw);
+        if (addons.getSetting("Movement Fix").isEnabled() && target != null) {
+//            event.setYaw(yaw);
+            event.yaw = yaw;
         }
     }
 
     @Override
     public void onKeepSprintEvent(KeepSprintEvent event) {
-        if(addons.getSetting("Keep Sprint").isEnabled()) {
+        if (addons.getSetting("Keep Sprint").isEnabled()) {
             event.cancel();
         }
     }
@@ -344,26 +339,23 @@ public final class KillAura extends Module {
             return true;
         }
 
-        if (ban.getSetting("Chest").isEnabled() && mc.currentScreen instanceof GuiChest) {
-            return true;
-        }
-        return false;
+        return ban.getSetting("Chest").isEnabled() && mc.currentScreen instanceof GuiChest;
     }
 
     @Override
     public void onRender3DEvent(Render3DEvent event) {
         auraESPAnim.setDirection(target != null ? Direction.FORWARDS : Direction.BACKWARDS);
-        if(target != null) {
+        if (target != null) {
             auraESPTarget = target;
         }
 
-        if(auraESPAnim.finished(Direction.BACKWARDS)) {
+        if (auraESPAnim.finished(Direction.BACKWARDS)) {
             auraESPTarget = null;
         }
 
         Color color = HUDMod.getClientColors().getFirst();
 
-        if(auraESP.isEnabled("Custom Color")){
+        if (auraESP.isEnabled("Custom Color")) {
             color = customColor.getColor();
         }
 

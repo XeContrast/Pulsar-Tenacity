@@ -1,8 +1,8 @@
 package net.minecraft.util;
 
 import dev.tenacity.Tenacity;
+import dev.tenacity.event.impl.player.MovementInputUpdateEvent;
 import dev.tenacity.module.impl.movement.Speed;
-import dev.tenacity.utils.player.MovementUtils;
 import net.minecraft.client.settings.GameSettings;
 
 public class MovementInputFromOptions extends MovementInput {
@@ -31,7 +31,9 @@ public class MovementInputFromOptions extends MovementInput {
         if (this.gameSettings.keyBindRight.isKeyDown()) {
             --this.moveStrafe;
         }
+        final MovementInputUpdateEvent event = new MovementInputUpdateEvent(moveStrafe, moveForward, jump, sneak);
 
+        Tenacity.INSTANCE.eventProtocol.handleEvent(event);
         this.jump = this.gameSettings.keyBindJump.isKeyDown() && !(Tenacity.INSTANCE.getModuleCollection().getModule(Speed.class).shouldPreventJumping());
         this.sneak = this.gameSettings.keyBindSneak.isKeyDown();
 

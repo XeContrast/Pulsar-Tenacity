@@ -17,49 +17,123 @@ import java.util.function.Consumer;
 public abstract class ListenerAdapter implements EventListener {
 
     // Game
-    public void onGameCloseEvent(GameCloseEvent event) {}
-    public void onKeyPressEvent(KeyPressEvent event) {}
-    public void onRenderTickEvent(RenderTickEvent event) {}
-    public void onTickEvent(TickEvent event) {}
-    public void onWorldEvent(WorldEvent event) {}
+    public void onGameCloseEvent(GameCloseEvent event) {
+    }
+
+    public void onKeyPressEvent(KeyPressEvent event) {
+    }
+
+    public void onRenderTickEvent(RenderTickEvent event) {
+    }
+
+    public void onTickEvent(TickEvent event) {
+    }
+
+    public void onWorldEvent(WorldEvent event) {
+    }
 
     // Network
-    public void onPacketReceiveEvent(PacketReceiveEvent event) {}
-    public void onPacketSendEvent(PacketSendEvent event) {}
+    public void onPacketReceiveEvent(PacketReceiveEvent event) {
+    }
+
+    public void onPacketSendEvent(PacketSendEvent event) {
+    }
 
     // Player
-    public void onAttackEvent(AttackEvent event) {}
-    public void onBlockEvent(BlockEvent event) {}
-    public void onBlockPlaceable(BlockPlaceableEvent event) {}
-    public void onBoundingBoxEvent(BoundingBoxEvent event) {}
-    public void onChatReceivedEvent(ChatReceivedEvent event) {}
-    public void onClickEvent(ClickEvent event) {}
-    public void onClickEventRight(ClickEventRight event) {}
-    public void onJumpEvent(JumpEvent event) {}
-    public void onJumpFixEvent(JumpFixEvent event) {}
-    public void onKeepSprintEvent(KeepSprintEvent event) {}
-    public void onLivingDeathEvent(LivingDeathEvent event) {}
-    public void onMotionEvent(MotionEvent event) {}
-    public void onMoveEvent(MoveEvent event) {}
-    public void onPlayerMoveUpdateEvent(PlayerMoveUpdateEvent event) {}
-    public void onPlayerSendMessageEvent(PlayerSendMessageEvent event) {}
-    public void onPushOutOfBlockEvent(PushOutOfBlockEvent event) {}
-    public void onSafeWalkEvent(SafeWalkEvent event) {}
-    public void onSlowDownEvent(SlowDownEvent event) {}
-    public void onStepConfirmEvent(StepConfirmEvent event) {}
-    public void onUpdateEvent(UpdateEvent event) {}
+    public void onAttackEvent(AttackEvent event) {
+    }
+
+    public void onBlockEvent(BlockEvent event) {
+    }
+
+    public void onBlockPlaceable(BlockPlaceableEvent event) {
+    }
+
+    public void onBoundingBoxEvent(BoundingBoxEvent event) {
+    }
+
+    public void onChatReceivedEvent(ChatReceivedEvent event) {
+    }
+
+    public void onClickEvent(ClickEvent event) {
+    }
+
+    public void onClickEventRight(ClickEventRight event) {
+    }
+
+    public void onJumpEvent(JumpEvent event) {
+    }
+
+    public void onJumpFixEvent(JumpFixEvent event) {
+    }
+
+    public void onKeepSprintEvent(KeepSprintEvent event) {
+    }
+
+    public void onLivingDeathEvent(LivingDeathEvent event) {
+    }
+
+    public void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
+
+    }
+
+    public void onMotionEvent(MotionEvent event) {
+    }
+
+    public void onMoveEvent(MoveEvent event) {
+    }
+
+    public void onPlayerMoveUpdateEvent(PlayerMoveUpdateEvent event) {
+    }
+
+    public void onPlayerSendMessageEvent(PlayerSendMessageEvent event) {
+    }
+
+    public void onPushOutOfBlockEvent(PushOutOfBlockEvent event) {
+    }
+
+    public void onSafeWalkEvent(SafeWalkEvent event) {
+    }
+
+    public void onSlowDownEvent(SlowDownEvent event) {
+    }
+
+    public void onStepConfirmEvent(StepConfirmEvent event) {
+    }
+
+    public void onUpdateEvent(UpdateEvent event) {
+    }
 
     // Render
-    public void onHurtCamEvent(HurtCamEvent event) {}
-    public void onNametagRenderEvent(NametagRenderEvent event) {}
-    public void onPreRenderEvent(PreRenderEvent event) {}
-    public void onRender2DEvent(Render2DEvent event) {}
-    public void onRender3DEvent(Render3DEvent event) {}
-    public void onRenderChestEvent(RenderChestEvent event) {}
-    public void onRendererLivingEntityEvent(RendererLivingEntityEvent event) {}
-    public void onRenderModelEvent(RenderModelEvent event) {}
-    public void onCustomBlockRender(CustomBlockRenderEvent event) {}
-    public void onShaderEvent(ShaderEvent event) {}
+    public void onHurtCamEvent(HurtCamEvent event) {
+    }
+
+    public void onNametagRenderEvent(NametagRenderEvent event) {
+    }
+
+    public void onPreRenderEvent(PreRenderEvent event) {
+    }
+
+    public void onRender2DEvent(Render2DEvent event) {
+    }
+
+    public void onRender3DEvent(Render3DEvent event) {
+    }
+
+    public void onRenderChestEvent(RenderChestEvent event) {
+    }
+
+    public void onRendererLivingEntityEvent(RendererLivingEntityEvent event) {
+    }
+
+    public void onRenderModelEvent(RenderModelEvent event) {
+    }
+
+    public void onCustomBlockRender(CustomBlockRenderEvent event) {
+    }
+
+    public void onShaderEvent(ShaderEvent event) {
+    }
 
     private final Map<Class<? extends Event>, Consumer<Event>> methods = new HashMap<>();
 
@@ -104,6 +178,7 @@ public abstract class ListenerAdapter implements EventListener {
         registerEvent(JumpFixEvent.class, this::onJumpFixEvent);
         registerEvent(KeepSprintEvent.class, this::onKeepSprintEvent);
         registerEvent(LivingDeathEvent.class, this::onLivingDeathEvent);
+        registerEvent(MovementInputUpdateEvent.class, this::onMovementInputUpdateEvent);
         registerEvent(MotionEvent.class, this::onMotionEvent);
         registerEvent(MoveEvent.class, this::onMoveEvent);
         registerEvent(PlayerMoveUpdateEvent.class, this::onPlayerMoveUpdateEvent);

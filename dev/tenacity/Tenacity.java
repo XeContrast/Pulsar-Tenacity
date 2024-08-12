@@ -21,13 +21,11 @@ import dev.tenacity.utils.objects.Dragging;
 import dev.tenacity.utils.server.PingerUtils;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.util.ChatComponentText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.File;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

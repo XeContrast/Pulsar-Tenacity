@@ -18,7 +18,7 @@ public class PlayerMoveUpdateEvent extends Event {
     public void applyMotion(double speed, float strafeMotion) {
         float remainder = 1 - strafeMotion;
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-        strafeMotion *= 0.91;
+        strafeMotion *= 0.91F;
         if (player.onGround) {
             MovementUtils.setSpeed(speed);
         } else {
