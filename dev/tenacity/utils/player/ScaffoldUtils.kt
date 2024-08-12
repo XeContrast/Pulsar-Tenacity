@@ -39,10 +39,14 @@ object ScaffoldUtils : Utils {
             val belowBlockPos =
                 BlockPos(
                     mc.thePlayer.posX,
-                    if (!Scaffold.keepYMode.`is`("WatchDog")) {
+                    if (!Scaffold.keepY.isEnabled) {
                         yLevel - (if (Scaffold.isDownwards) 1 else 0)
                     } else {
-                        yLevel + if (mc.thePlayer.motionY == 0.4) 1 else 0
+                        if (Scaffold.keepYMode.`is`("WatchDog")) {
+                            yLevel + if (mc.thePlayer.motionY in 0.1..0.2) 1 else 0
+                        } else {
+                            yLevel
+                        }
                     }, mc.thePlayer.posZ)
             if (mc.theWorld.getBlockState(belowBlockPos).block is BlockAir) {
                 for (x in 0..3) {
