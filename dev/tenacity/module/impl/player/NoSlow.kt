@@ -1,6 +1,6 @@
 package dev.tenacity.module.impl.player
 
-import dev.tenacity.Tenacity
+import dev.tenacity.event.impl.network.PacketSendEvent
 import dev.tenacity.event.impl.player.MotionEvent
 import dev.tenacity.event.impl.player.SlowDownEvent
 import dev.tenacity.module.Category
@@ -14,14 +14,14 @@ import net.minecraft.item.ItemBucketMilk
 import net.minecraft.item.ItemPotion
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
-import tv.twitch.chat.Chat
 
 class NoSlow : Module("NoSlow", Category.PLAYER, "prevent item slowdown") {
     private val mode = ModeSetting("Mode", "Watchdog", "Vanilla", "NCP", "WatchDog")
     private var synced = false
+    private var offGroundTicks = 0
+    private var send = false
 
     init {
         this.addSettings(mode)
@@ -37,6 +37,11 @@ class NoSlow : Module("NoSlow", Category.PLAYER, "prevent item slowdown") {
         event.cancel()
     }
 
+    override fun onDisable() {
+        offGroundTicks = 0
+        send = false
+    }
+
     override fun onMotionEvent(e: MotionEvent) {
         this.suffix = mode.mode
         when (mode.mode) {
@@ -48,11 +53,28 @@ class NoSlow : Module("NoSlow", Category.PLAYER, "prevent item slowdown") {
                         if (heldItem.item is ItemPotion || heldItem.item is ItemBucketMilk) {
                             return
                         }
+                        if (mc.thePlayer.onGround) {
+                            offGroundTicks = 0
+                        } else {
+                            offGroundTicks++
+                        }
+                        if (offGroundTicks == 4 && send) {
+                            send = false
+                            PacketUtils.sendPacketNoEvent(
+                                C08PacketPlayerBlockPlacement(
+                                    BlockPos(-1, -1, -1),
+                                    255, heldItem,
+                                    0f, 0f, 0f
+                                )
+                            )
+                        } else if (heldItem != null && mc.thePlayer.isUsingItem) {
+                            e.y += 1E-14
+                        }
 
                         if (getEmptySlot() != -1) {
                             if (mc.thePlayer.ticksExisted % 3 == 0) {
                                 ChatUtil.print(true,"C08")
-                                PacketUtils.sendPacketNoEvent(
+                                PacketUtils.sendPacket(
                                     C08PacketPlayerBlockPlacement(
                                         BlockPos(-1, -1, -1),
                                         1,
@@ -79,6 +101,22 @@ class NoSlow : Module("NoSlow", Category.PLAYER, "prevent item slowdown") {
                     )
                 } else {
                     PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.currentEquippedItem))
+                }
+            }
+        }
+    }
+
+    override fun onPacketSendEvent(event: PacketSendEvent) {
+        val helditem = mc.thePlayer.heldItem
+        if (mode.`is`("WatchDog")) {
+            if (event.packet is C08PacketPlayerBlockPlacement && !mc.thePlayer.isUsingItem) {
+                val blockPlacement = event.packet as C08PacketPlayerBlockPlacement
+                if (helditem != null && blockPlacement.placedBlockDirection == 255 && offGroundTicks < 2) {
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.jump()
+                    }
+                    send = true
+                    event.cancel()
                 }
             }
         }
