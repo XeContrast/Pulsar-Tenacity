@@ -58,11 +58,11 @@ public class GuiConnecting extends GuiScreen {
                     GuiConnecting.this.networkManager = NetworkManager.createNetworkManagerAndConnect(inetaddress, port, GuiConnecting.this.mc2.gameSettings.isUsingNativeTransport());
                     GuiConnecting.this.networkManager.setNetHandler(new NetHandlerLoginClient(GuiConnecting.this.networkManager, GuiConnecting.this.mc2, GuiConnecting.this.previousGuiScreen));
                     GuiConnecting.this.networkManager.sendPacket(new C00Handshake(47, ip, port, EnumConnectionState.LOGIN));
-                    if (mc2.getSession() != null && mc2.getSession().getProfile() != null && mc2.getSession().getProfile().getId() != null) {
+//                    if (mc2.getSession() != null && mc2.getSession().getProfile() != null && mc2.getSession().getProfile().getId() != null) {
                         GuiConnecting.this.networkManager.sendPacket(new C00PacketLoginStart(GuiConnecting.this.mc2.getSession().getProfile()));
-                    } else {
-                        GuiConnecting.this.mc2.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Tenacity: Null session (Not logged in?)")));
-                    }
+//                    } else {
+//                        GuiConnecting.this.mc2.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Tenacity: Null session (Not logged in?)")));
+//                    }
                 } catch (UnknownHostException unknownhostexception) {
                     if (GuiConnecting.this.cancel) {
                         return;

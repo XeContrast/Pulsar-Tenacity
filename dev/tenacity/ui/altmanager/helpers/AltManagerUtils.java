@@ -11,6 +11,7 @@ import dev.tenacity.utils.misc.Multithreading;
 import dev.tenacity.utils.objects.TextField;
 import dev.tenacity.utils.time.TimerUtil;
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Session;
 
@@ -34,20 +35,15 @@ public class AltManagerUtils implements Utils {
     public static File altsFile = new File(Tenacity.DIRECTORY, "Alts.json");
 
     public AltManagerUtils() {
-        if (!altsFile.exists()) {
-            try {
-                if (altsFile.getParentFile().mkdirs()) {
-                    altsFile.createNewFile();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
         try {
+            if(!altsFile.exists()){
+                altsFile.createNewFile();
+            }
             byte[] content = Files.readAllBytes(altsFile.toPath());
             alts = new ArrayList<>(Arrays.asList(new Gson().fromJson(new String(content), Alt[].class)));
             alts.forEach(this::getHead);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
