@@ -3,6 +3,8 @@
 
 ![img.png](img.png)
 
+Nigga rotation by tenashitty
+
 
 # Dev List:
 -Xebook1
