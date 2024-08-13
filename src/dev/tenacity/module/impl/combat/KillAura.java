@@ -105,10 +105,10 @@ public final class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", Category.COMBAT, "Automatically attacks players");
-        autoblockMode.addParent(autoblock, _ -> autoblock.isEnabled());
-        rotationMode.addParent(rotations, _ -> rotations.isEnabled());
-        switchDelay.addParent(mode, _ -> mode.is("Switch"));
-        maxTargetAmount.addParent(mode, _ -> mode.is("Multi"));
+        autoblockMode.addParent(autoblock, e -> autoblock.isEnabled());
+        rotationMode.addParent(rotations, e -> rotations.isEnabled());
+        switchDelay.addParent(mode, e -> mode.is("Switch"));
+        maxTargetAmount.addParent(mode, e -> mode.is("Multi"));
         customColor.addParent(auraESP, r -> r.isEnabled("Custom Color"));
         this.addSettings(targetsSetting, ban, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
                 rotations, rotationMode, sortMode, debug, addons, auraESP, customColor);
