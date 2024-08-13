@@ -13,7 +13,6 @@ import dev.tenacity.ui.sidegui.SideGUI;
 import dev.tenacity.utils.animations.Animation;
 import dev.tenacity.utils.animations.Direction;
 import dev.tenacity.utils.animations.impl.DecelerateAnimation;
-import dev.tenacity.utils.font.FontUtil;
 import dev.tenacity.utils.misc.HoveringUtil;
 import dev.tenacity.utils.misc.IOUtils;
 import dev.tenacity.utils.objects.DiscordAccount;
@@ -23,7 +22,6 @@ import dev.tenacity.utils.render.RenderUtil;
 import dev.tenacity.utils.render.RoundedUtil;
 import dev.tenacity.utils.render.StencilUtil;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -73,7 +71,7 @@ public class CompactClickgui extends GuiScreen {
             x -= width + rectWidth / 2f;
             x += (width + rectWidth / 2f) * openingAnimation.getOutput().floatValue();
         }
-        Gui.drawRect2(x, y, rectWidth, rectHeight, new Color(20, 20, 20).getRGB());
+        drawRect2(x, y, rectWidth, rectHeight, new Color(20, 20, 20).getRGB());
 
     }
 
@@ -90,7 +88,7 @@ public class CompactClickgui extends GuiScreen {
                 Tenacity.INSTANCE.getSideGui().setFocused(false);
                 return;
             }
-            
+
             openingAnimation.setDirection(Direction.BACKWARDS);
         }
         modulePanel.keyTyped(typedChar, keyCode);
@@ -102,6 +100,7 @@ public class CompactClickgui extends GuiScreen {
     private Color firstColor = Color.BLACK, secondColor = Color.BLACK;
 
     private final List<ModuleRect> searchResults = new ArrayList<>();
+
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         if (ModuleCollection.reloadModules || moduleRects == null) {
@@ -120,7 +119,6 @@ public class CompactClickgui extends GuiScreen {
             ModuleCollection.reloadModules = false;
             return;
         }
-
 
 
         typing = modulePanel.typing || (Tenacity.INSTANCE.getSideGui().isFocused() && Tenacity.INSTANCE.getSideGui().isTyping()) || Tenacity.INSTANCE.getSearchBar().isTyping();
@@ -146,26 +144,26 @@ public class CompactClickgui extends GuiScreen {
         rectHeight = 300;
 
 
-        Gui.drawRect2(x, y, rectWidth, rectHeight, new Color(27, 27, 27).getRGB());
+        drawRect2(x, y, rectWidth, rectHeight, new Color(27, 27, 27).getRGB());
 
 
-        Gui.drawRect2(x, y, 90, rectHeight, new Color(39, 39, 39).getRGB());
+        drawRect2(x, y, 90, rectHeight, new Color(39, 39, 39).getRGB());
 
         GlStateManager.color(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_BLEND);
         mc.getTextureManager().bindTexture(new ResourceLocation("Tenacity/modernlogo.png"));
-        Gui.drawModalRectWithCustomSizedTexture(x + 5, y + 5, 0, 0, 20.5f, 20.5f, 20.5f, 20.5f);
+        drawModalRectWithCustomSizedTexture(x + 5, y + 5, 0, 0, 20.5f, 20.5f, 20.5f, 20.5f);
 
-        FontUtil.tenacityBoldFont22.drawString(Tenacity.NAME, x + 33, y + 7, -1);
-        FontUtil.tenacityFont16.drawCenteredString(Tenacity.VERSION,
-                (float) (x + 31 + FontUtil.tenacityBoldFont22.getStringWidth(Tenacity.NAME) / 2f), y + 19, -1);
+        tenacityBoldFont22.drawString(Tenacity.NAME, x + 33, y + 7, -1);
+        tenacityFont16.drawCenteredString(Tenacity.VERSION,
+                (float) (x + 31 + tenacityBoldFont22.getStringWidth(Tenacity.NAME) / 2f), y + 19, -1);
 
         boolean searching = Tenacity.INSTANCE.getSearchBar().isFocused();
 
         float bannerHeight = 75 / 2f;
-        Gui.drawRect2(x + 5, y + 31, 80, .5, new Color(110, 110, 110).getRGB());
+        drawRect2(x + 5, y + 31, 80, .5, new Color(110, 110, 110).getRGB());
 
-        Gui.drawRect2(x + 5, y + rectHeight - (bannerHeight + 3), 80, .5, new Color(110, 110, 110).getRGB());
+        drawRect2(x + 5, y + rectHeight - (bannerHeight + 3), 80, .5, new Color(110, 110, 110).getRGB());
 
 
         if (Tenacity.INSTANCE.getDiscordAccount() != null) {
@@ -182,13 +180,13 @@ public class CompactClickgui extends GuiScreen {
                 //GlStateManager.color(1, 1, 1);
                 GlStateManager.color(1, 1, 1, alpha / 255f);
                 GL11.glEnable(GL11.GL_BLEND);
-                Gui.drawModalRectWithCustomSizedTexture(x, y + rectHeight - (bannerHeight), 0, 0, bannerWidth, bannerHeight, bannerWidth, bannerHeight);
+                drawModalRectWithCustomSizedTexture(x, y + rectHeight - (bannerHeight), 0, 0, bannerWidth, bannerHeight, bannerWidth, bannerHeight);
             } else {
                 String stringBuilder = "ff" + discordAccount.bannerColor;
                 int integer = (int) Long.parseLong(stringBuilder, 16);
                 GlStateManager.color(1, 1, 1, 1);
                 float alpha = hoveringDiscord ? 170 : 0;
-                Gui.drawRect2(x, y + rectHeight - bannerHeight, bannerWidth, bannerHeight, ColorUtil.applyOpacity(integer, alpha / 255f));
+                drawRect2(x, y + rectHeight - bannerHeight, bannerWidth, bannerHeight, ColorUtil.applyOpacity(integer, alpha / 255f));
             }
 
 
@@ -201,19 +199,19 @@ public class CompactClickgui extends GuiScreen {
 
             float middleY = (y + rectHeight - (avatarSize - 9));
 
-            FontUtil.tenacityBoldFont18.drawString(discordTag.substring(0, discordTag.indexOf("#")), x + 5,
+            tenacityBoldFont18.drawString(discordTag.substring(0, discordTag.indexOf("#")), x + 5,
                     middleY, -1);
 
             //Move the tag around if the username is too long
             Color tagColor = hoveringDiscord ? ColorUtil.tripleColor(175) : Color.WHITE;
             if ((discordTag.length() - 4) > 13) {
-                FontUtil.tenacityFont14.drawString(discordTag.substring(discordTag.indexOf("#")),
-                        x + 5 + FontUtil.tenacityBoldFont18.getStringWidth(discordTag.substring(0, discordTag.indexOf("#"))) -
-                                FontUtil.tenacityFont14.getStringWidth(discordTag.substring(discordTag.indexOf("#"))),
+                tenacityFont14.drawString(discordTag.substring(discordTag.indexOf("#")),
+                        x + 5 + tenacityBoldFont18.getStringWidth(discordTag.substring(0, discordTag.indexOf("#"))) -
+                                tenacityFont14.getStringWidth(discordTag.substring(discordTag.indexOf("#"))),
                         middleY - 6, tagColor);
             } else {
-                FontUtil.tenacityFont14.drawString(discordTag.substring(discordTag.indexOf("#")),
-                        x + 5 + FontUtil.tenacityBoldFont18.getStringWidth(discordTag.substring(0, discordTag.indexOf("#"))),
+                tenacityFont14.drawString(discordTag.substring(discordTag.indexOf("#")),
+                        x + 5 + tenacityBoldFont18.getStringWidth(discordTag.substring(0, discordTag.indexOf("#"))),
                         middleY + 2, tagColor);
             }
         }
@@ -230,8 +228,8 @@ public class CompactClickgui extends GuiScreen {
             Color categoryColor = hovering ? ColorUtil.tripleColor(110).brighter() : ColorUtil.tripleColor(110);
             Color selectColor = (clickGUIMod.getActiveCategory() == category) ? Color.WHITE : categoryColor;
 
-            if(!searching && (clickGUIMod.getActiveCategory() == category)) {
-                Gui.drawRect2(x, catY, 90, catHeight, new Color(27, 27, 27).getRGB());
+            if (!searching && (clickGUIMod.getActiveCategory() == category)) {
+                drawRect2(x, catY, 90, catHeight, new Color(27, 27, 27).getRGB());
             }
 
             RenderUtil.resetColor();
@@ -248,7 +246,7 @@ public class CompactClickgui extends GuiScreen {
         modulePanel.rectWidth = rectWidth;
 
         StencilUtil.initStencilToWrite();
-        Gui.drawRect2(x, y, rectWidth, rectHeight, -1);
+        drawRect2(x, y, rectWidth, rectHeight, -1);
         StencilUtil.readStencilBuffer(1);
         modulePanel.drawScreen(fakeMouseX, fakeMouseY);
         StencilUtil.uninitStencilBuffer();

@@ -492,7 +492,7 @@ public class PasswordField extends Gui {
             if (flag1) {
                 RenderUtil.resetColor();
                 if (flag2) {
-                    Gui.drawRect(k1 + 4, i1 - 1, k1 + 5, i1 + 1 + fontRenderer.getHeight(), this.cursorColor);
+                    drawRect(k1 + 4, i1 - 1, k1 + 5, i1 + 1 + fontRenderer.getHeight(), this.cursorColor);
                 } else if (System.currentTimeMillis() % 1000 < 500) {
                     fontRenderer.drawString("|", (float) k1 + 2, (float) i1 - 0.5F, textColor);
                 }
