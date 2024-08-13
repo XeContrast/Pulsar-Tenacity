@@ -5,6 +5,7 @@ import dev.tenacity.module.impl.movement.Scaffold
 import dev.tenacity.module.impl.movement.Speed
 import dev.tenacity.utils.Utils
 import dev.tenacity.utils.Utils.mc
+import dev.tenacity.utils.player.BlockUtils.getBlock
 import net.minecraft.block.Block
 import net.minecraft.block.BlockAir
 import net.minecraft.init.Blocks
@@ -12,15 +13,17 @@ import net.minecraft.item.ItemBlock
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
 object ScaffoldUtils : Utils {
+    private var lastGroundY = 0
     val yLevel: Double
         get() {
             if (!Scaffold.keepY.isEnabled || Scaffold.keepYMode.`is`("Speed toggled") && !Tenacity.INSTANCE.isEnabled(
                     Speed::class.java
-                ) || Scaffold.keepYMode.`is`("WatchDog") && mc.thePlayer.motionY >= 0.2
+                )
             ) {
                 return mc.thePlayer.posY - 1.0
             }
@@ -43,7 +46,12 @@ object ScaffoldUtils : Utils {
                         yLevel - (if (Scaffold.isDownwards) 1 else 0)
                     } else {
                         if (Scaffold.keepYMode.`is`("WatchDog")) {
-                            yLevel + if (mc.thePlayer.motionY in 0.1..0.2) 1 else 0
+                            if (Scaffold.up) {
+                                yLevel + 1
+                                mc.thePlayer.posY - 0.6
+                            } else {
+                                yLevel
+                            }
                         } else {
                             yLevel
                         }
@@ -133,6 +141,22 @@ object ScaffoldUtils : Utils {
             x += 0.15
         }
         return Vec3(x, y, z)
+    }
+
+    fun groundDistance(): Double {
+        for (i in 1..20) {
+            if (!mc.thePlayer.onGround && getBlock(
+                    BlockPos(
+                        mc.thePlayer.posX,
+                        mc.thePlayer.posY - (i.toDouble() / 10),
+                        mc.thePlayer.posZ
+                    )
+                ) !is BlockAir
+            ) {
+                return (i.toDouble() / 10)
+            }
+        }
+        return (-1).toDouble()
     }
 
     class BlockCache(val position: BlockPos, val facing: EnumFacing)

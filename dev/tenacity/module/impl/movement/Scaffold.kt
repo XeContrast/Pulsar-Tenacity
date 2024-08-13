@@ -1,10 +1,12 @@
 package dev.tenacity.module.impl.movement
 
 import dev.tenacity.event.impl.game.TickEvent
+import dev.tenacity.event.impl.network.PacketReceiveEvent
 import dev.tenacity.event.impl.network.PacketSendEvent
 import dev.tenacity.event.impl.player.BlockPlaceableEvent
 import dev.tenacity.event.impl.player.MotionEvent
 import dev.tenacity.event.impl.player.SafeWalkEvent
+import dev.tenacity.event.impl.player.UpdateEvent
 import dev.tenacity.module.Category
 import dev.tenacity.module.Module
 import dev.tenacity.module.settings.ParentAttribute
@@ -23,6 +25,7 @@ import dev.tenacity.utils.player.MovementUtils.setSpeed
 import dev.tenacity.utils.player.RotationUtils
 import dev.tenacity.utils.player.ScaffoldUtils
 import dev.tenacity.utils.player.ScaffoldUtils.BlockCache
+import dev.tenacity.utils.player.ScaffoldUtils.groundDistance
 import dev.tenacity.utils.render.ColorUtil
 import dev.tenacity.utils.render.RenderUtil
 import dev.tenacity.utils.render.RoundedUtil
@@ -36,6 +39,7 @@ import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.client.C0APacketAnimation
 import net.minecraft.network.play.client.C0BPacketEntityAction
@@ -81,6 +85,7 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
     // WATCHDOG
     private var wdTick = 0
     private var wdSpoof = false
+    private var lastGroundY = 0
 
     private val anim: Animation = DecelerateAnimation(250, 1.0)
 
@@ -130,9 +135,11 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
         } else {
             mc.timer.timerSpeed = if (tower.isEnabled) towerTimer.value.toFloat() else 1F
         }
+        up = mc.thePlayer.fallDistance > 0
 
         if (e.isPre) {
             if (towerMode.`is`("WatchDog") && tower.isEnabled && mc.gameSettings.keyBindJump.isKeyDown) {
+                mc.thePlayer.isSprinting = false
                     if (mc.thePlayer.onGround) {
                         wdTick = 0
                         mc.thePlayer.motionY = 0.42
@@ -164,7 +171,11 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
                 setSpeed(baseMoveSpeed * 0.7)
             }
             if (autoJump.isEnabled && mc.thePlayer.onGround && isMoving && !mc.gameSettings.keyBindJump.isKeyDown) {
+                placeticks = 0
                 mc.thePlayer.jump()
+            }
+            if (!mc.thePlayer.onGround) {
+                placeticks++
             }
 
             if (sprint.isEnabled && sprintMode.`is`("Watchdog") && mc.thePlayer.onGround && isMoving && !mc.gameSettings.keyBindJump.isKeyDown && !isDownwards && mc.thePlayer.isSprinting) {
@@ -385,6 +396,9 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
     }
 
     override fun onDisable() {
+        wdTick = 0
+        wdSpoof = false
+        placeticks = 0
         if (mc.thePlayer != null) {
             if (!itemSpoof.isEnabled) mc.thePlayer.inventory.currentItem = prevSlot
             if (slot != mc.thePlayer.inventory.currentItem && itemSpoof.isEnabled) PacketUtils.sendPacketNoEvent(
@@ -407,6 +421,7 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
     }
 
     override fun onEnable() {
+        lastGroundY = mc.thePlayer.motionY.toInt()
         lastBlockCache = null
         if (mc.thePlayer != null) {
             prevSlot = mc.thePlayer.inventory.currentItem
@@ -632,5 +647,9 @@ class Scaffold : Module("Scaffold", Category.MOVEMENT, "Automatically places blo
         var keepYCoord: Double = 0.0
         @JvmField
         var isDownwards = false
+        @JvmField
+        var placeticks = 0
+        @JvmField
+        var up = false
     }
 }
