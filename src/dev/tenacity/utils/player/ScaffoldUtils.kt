@@ -63,7 +63,7 @@ object ScaffoldUtils : Utils {
                         while (i > -3) {
                             val blockPos = belowBlockPos.add(x * i, 0, z * i)
                             if (mc.theWorld.getBlockState(blockPos).block is BlockAir) {
-                                for (direction in EnumFacing.entries) {
+                                for (direction in EnumFacing.values()) {
                                     val block = blockPos.offset(direction)
                                     val material = mc.theWorld.getBlockState(block).block.material
                                     if (material.isSolid && !material.isLiquid) {

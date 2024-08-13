@@ -1,4 +1,12 @@
 # Pulsar
-Main Dev is -Xebook1
+超级Tena打滑客户👍👍👍
 
-secondary Dev is xiaohouzhu233
+![img.png](img.png)
+
+Nigga rotation by tenashitty
+
+
+# Dev List:
+-Xebook1
+xiaozhuhou233
+HatePixel2333

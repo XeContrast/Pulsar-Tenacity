@@ -16,13 +16,11 @@ import dev.tenacity.ui.sidegui.SideGUI;
 import dev.tenacity.utils.animations.Animation;
 import dev.tenacity.utils.animations.Direction;
 import dev.tenacity.utils.animations.impl.DecelerateAnimation;
-import dev.tenacity.utils.font.FontUtil;
 import dev.tenacity.utils.misc.HoveringUtil;
 import dev.tenacity.utils.objects.Drag;
 import dev.tenacity.utils.render.RoundedUtil;
 import dev.tenacity.utils.render.StencilUtil;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -194,22 +192,22 @@ public class ModernClickGui extends GuiScreen {
         adjustWidth(55 - (55 * expandedAnimation.getOutput().floatValue()));
 
         StencilUtil.initStencilToWrite();
-        Gui.drawRect2(x, y, (float) (100 - (55 * expandedAnimation.getOutput().floatValue())), rectHeight, -1);
+        drawRect2(x, y, (float) (100 - (55 * expandedAnimation.getOutput().floatValue())), rectHeight, -1);
         StencilUtil.readStencilBuffer(1);
 
 
         GL11.glEnable(GL11.GL_BLEND);
         mc.getTextureManager().bindTexture(new ResourceLocation("Tenacity/modernlogo.png"));
-        Gui.drawModalRectWithCustomSizedTexture((float) (x + 9 + (3 * expandedAnimation.getOutput().floatValue())), y + 6, 0, 0, 20.5f, 20.5f, 20.5f, 20.5f);
+        drawModalRectWithCustomSizedTexture((float) (x + 9 + (3 * expandedAnimation.getOutput().floatValue())), y + 6, 0, 0, 20.5f, 20.5f, 20.5f, 20.5f);
         GL11.glDisable(GL11.GL_BLEND);
 
-        Gui.drawRect2(x + 10, y + 35, 80 - (55 * expandedAnimation.getOutput().floatValue()), 1, lighterGray.getRGB());
+        drawRect2(x + 10, y + 35, 80 - (55 * expandedAnimation.getOutput().floatValue()), 1, lighterGray.getRGB());
 
 
         float xAdjust = 10 * expandedAnimation.getOutput().floatValue();
-        FontUtil.tenacityFont20.drawString("Tenacity", x + 35 + xAdjust, y + 13, -1);
+        tenacityFont20.drawString("Tenacity", x + 35 + xAdjust, y + 13, -1);
 
-        FontUtil.tenacityFont14.drawString(Tenacity.VERSION, x + 41 + FontUtil.tenacityFont18.getStringWidth("Tenacity") + xAdjust, y + 15.5f,
+        tenacityFont14.drawString(Tenacity.VERSION, x + 41 + tenacityFont18.getStringWidth("Tenacity") + xAdjust, y + 15.5f,
                 new Color(98, 98, 98));
 
 

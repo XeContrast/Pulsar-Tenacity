@@ -105,10 +105,10 @@ public final class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", Category.COMBAT, "Automatically attacks players");
-        autoblockMode.addParent(autoblock, a -> autoblock.isEnabled());
-        rotationMode.addParent(rotations, r -> rotations.isEnabled());
-        switchDelay.addParent(mode, m -> mode.is("Switch"));
-        maxTargetAmount.addParent(mode, m -> mode.is("Multi"));
+        autoblockMode.addParent(autoblock, _ -> autoblock.isEnabled());
+        rotationMode.addParent(rotations, _ -> rotations.isEnabled());
+        switchDelay.addParent(mode, _ -> mode.is("Switch"));
+        maxTargetAmount.addParent(mode, _ -> mode.is("Multi"));
         customColor.addParent(auraESP, r -> r.isEnabled("Custom Color"));
         this.addSettings(targetsSetting, ban, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
                 rotations, rotationMode, sortMode, debug, addons, auraESP, customColor);
@@ -132,7 +132,7 @@ public final class KillAura extends Module {
 
     @Override
     public void onMotionEvent(MotionEvent event) {
-        this.setSuffix(mode.getMode());
+        //this.setSuffix(mode.getMode());
         if (cancel()) {
             if (wasBlocking) {
                 wasBlocking = false;
@@ -167,6 +167,7 @@ public final class KillAura extends Module {
                         case "LockView":
                     }
                     yaw = event.getYaw();
+                    assert rotations != null;
                     event.setRotations(rotations[0], rotations[1]);
                     RotationUtils.setVisualRotations(event.getYaw(), event.getPitch());
                 }

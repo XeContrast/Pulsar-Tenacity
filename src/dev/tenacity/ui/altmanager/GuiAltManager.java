@@ -16,7 +16,6 @@ import dev.tenacity.ui.sidegui.utils.ToggleButton;
 import dev.tenacity.utils.objects.TextField;
 import dev.tenacity.utils.render.ColorUtil;
 import dev.tenacity.utils.render.GLUtil;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.input.Keyboard;
@@ -74,7 +73,7 @@ public class GuiAltManager extends GuiScreen {
 
         ScaledResolution sr = new ScaledResolution(mc);
 
-        Gui.drawRect2(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), ColorUtil.tripleColor(35).getRGB());
+        drawRect2(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), ColorUtil.tripleColor(35).getRGB());
 
 
         AltPanel altPanel = (AltPanel) panels.get(3);

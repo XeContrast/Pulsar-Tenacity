@@ -29,7 +29,7 @@ public class Enhancements {
 
             url = URLDecoder.decode(url.substring("level://".length()), StandardCharsets.UTF_8.toString());
 
-            if (isLevelProtocol && (url.contains("..") || !url.endsWith("/resources.zip"))) {
+            if (isLevelProtocol && (url.contains("") || !url.endsWith("/resources.zip"))) {
                 throw new URISyntaxException(url, "Invalid levelstorage resourcepack path");
             }
 

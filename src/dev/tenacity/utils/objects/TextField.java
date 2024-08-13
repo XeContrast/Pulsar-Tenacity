@@ -439,7 +439,7 @@ public class TextField extends Gui {
                 RoundedUtil.drawRound(this.xPosition, this.yPosition, this.width, this.height, radius, ColorUtil.applyOpacity(fill, alpha));
             } else {
                 float rectHeight = 1;
-                Gui.drawRect2(xPosition, yPosition + height - rectHeight, width, rectHeight,
+                drawRect2(xPosition, yPosition + height - rectHeight, width, rectHeight,
                         ColorUtil.interpolateColor(focusedTextColor, unfocusedTextColor, textColor.getOutput().floatValue()));
             }
 
@@ -498,7 +498,7 @@ public class TextField extends Gui {
                     }
                 } else cursorBlinkAnimation.setDirection(Direction.FORWARDS);
 
-                Gui.drawRect2(k1 + 1, yPos - 2, .5f, font.getHeight() + 3,
+                drawRect2(k1 + 1, yPos - 2, .5f, font.getHeight() + 3,
                         ColorUtil.applyOpacity(textColorWithAlpha, cursorBlinkAnimation.getOutput().floatValue()).getRGB());
             }
 
