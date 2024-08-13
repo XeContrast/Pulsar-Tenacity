@@ -64,7 +64,8 @@ public final class KillAura extends Module {
     private final MultipleBoolSetting ban = new MultipleBoolSetting("Ban",
             new BooleanSetting("Eating", false),
             new BooleanSetting("Inventory", false),
-            new BooleanSetting("Chest", false)
+            new BooleanSetting("Chest", false),
+            new BooleanSetting("Scaffold",false)
     );
 
     private final ModeSetting mode = new ModeSetting("Mode", "Single", "Single", "Multi");
@@ -81,14 +82,13 @@ public final class KillAura extends Module {
     public final ModeSetting autoblockMode = new ModeSetting("Autoblock Mode", "Watchdog", "Fake", "Verus", "Watchdog", "HighVersion");
 
     private final BooleanSetting rotations = new BooleanSetting("Rotations", true);
-    private final ModeSetting rotationMode = new ModeSetting("Rotation Mode", "Vanilla", "Vanilla", "Smooth", "LockView");
+    private final ModeSetting rotationMode = new ModeSetting("Rotation Mode", "Vanilla", "Vanilla", "Smooth");
 
     private final ModeSetting sortMode = new ModeSetting("Sort Mode", "Range", "Range", "Hurt Time", "Health", "Armor");
 
     private final MultipleBoolSetting addons = new MultipleBoolSetting("Addons",
             new BooleanSetting("Keep Sprint", true),
             new BooleanSetting("Through Walls", true),
-            new BooleanSetting("Allow Scaffold", false),
             new BooleanSetting("Movement Fix", false),
             new BooleanSetting("Ray Cast", false));
 
@@ -105,10 +105,10 @@ public final class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", Category.COMBAT, "Automatically attacks players");
-        autoblockMode.addParent(autoblock, e -> autoblock.isEnabled());
-        rotationMode.addParent(rotations, e -> rotations.isEnabled());
-        switchDelay.addParent(mode, e -> mode.is("Switch"));
-        maxTargetAmount.addParent(mode, e -> mode.is("Multi"));
+        autoblockMode.addParent(autoblock, r -> autoblock.isEnabled());
+        rotationMode.addParent(rotations, r -> rotations.isEnabled());
+        switchDelay.addParent(mode, r -> mode.is("Switch"));
+        maxTargetAmount.addParent(mode, r -> mode.is("Multi"));
         customColor.addParent(auraESP, r -> r.isEnabled("Custom Color"));
         this.addSettings(targetsSetting, ban, mode, maxTargetAmount, switchDelay, minCPS, maxCPS, reach, autoblock, autoblockMode,
                 rotations, rotationMode, sortMode, debug, addons, auraESP, customColor);
@@ -151,7 +151,7 @@ public final class KillAura extends Module {
         sortTargets();
 
         if (event.isPre()) {
-            attacking = !targets.isEmpty() && (addons.getSetting("Allow Scaffold").isEnabled() || !Tenacity.INSTANCE.isEnabled(Scaffold.class));
+            attacking = !targets.isEmpty();
             blocking = autoblock.isEnabled() && attacking && InventoryUtils.isHoldingSword();
             if (attacking) {
                 target = targets.get(0);
@@ -164,7 +164,6 @@ public final class KillAura extends Module {
                         case "Smooth":
                             rotations = RotationUtils.getSmoothRotations(target);
                             break;
-                        case "LockView":
                     }
                     yaw = event.getYaw();
                     assert rotations != null;
@@ -337,6 +336,10 @@ public final class KillAura extends Module {
         }
 
         if (ban.getSetting("Eating").isEnabled() && mc.thePlayer.isUsingItem() && (item.getItem() instanceof ItemFood || item.getItem() instanceof ItemPotion || item.getItem() instanceof ItemBucketMilk)) {
+            return true;
+        }
+
+        if (ban.getSetting("Scaffold").isEnabled() && Tenacity.INSTANCE.getModuleCollection().getModule(Scaffold.class).isEnabled()) {
             return true;
         }
 
