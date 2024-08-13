@@ -21,7 +21,8 @@ class Criticals : Module("Criticals", Category.COMBAT, "Crit attacks") {
     private var stage = false
     private val offset = 0.0
     private var groundTicks = 0
-    private val mode = ModeSetting("Mode", "Watchdog", "Watchdog", "Packet", "Dev", "Verus")
+    private val mode = ModeSetting("Mode", "Watchdog", "Watchdog", "Packet", "Dev", "Verus","BlocksMC")
+    private val bmcmode = ModeSetting("BlocksMCMode","Motion","Motion","Packet")
     private val watchdogMode = ModeSetting("Watchdog Mode", "Packet", "Packet", "Edit")
     private val delay = NumberSetting("Delay", 1.0, 20.0, 0.0, 1.0)
     private val timer = TimerUtil()
@@ -29,7 +30,8 @@ class Criticals : Module("Criticals", Category.COMBAT, "Crit attacks") {
     init {
         delay.addParent(mode) { m: ModeSetting -> !(m.`is`("Verus") || (m.`is`("Watchdog") && watchdogMode.`is`("Edit"))) }
         watchdogMode.addParent(mode) { m: ModeSetting -> m.`is`("Watchdog") }
-        this.addSettings(mode, watchdogMode, delay)
+        bmcmode.addParent(mode) { m : ModeSetting -> m.`is`("BlocksMC")}
+        this.addSettings(mode, watchdogMode,bmcmode, delay)
     }
 
     override fun onPacketSendEvent(e: PacketSendEvent) {
@@ -65,6 +67,51 @@ class Criticals : Module("Criticals", Category.COMBAT, "Crit attacks") {
                         }
                     } else {
                         groundTicks = 0
+                    }
+                }
+            }
+
+            "BlocksMC" -> {
+                if (KillAura.attacking && !Step.isStepping) {
+                when (bmcmode.mode) {
+                        "Motion" -> {
+                            mc.thePlayer.sendQueue.addToSendQueue(
+                                C04PacketPlayerPosition(
+                                    mc.thePlayer.posX,
+                                    mc.thePlayer.posY + 0.001091981,
+                                    mc.thePlayer.posZ,
+                                    true
+                                )
+                            )
+                            mc.thePlayer.sendQueue.addToSendQueue(
+                                C04PacketPlayerPosition(
+                                    mc.thePlayer.posX,
+                                    mc.thePlayer.posY,
+                                    mc.thePlayer.posZ,
+                                    false
+                                )
+                            )
+                        }
+                        "Packet" -> {
+                            if (mc.thePlayer.ticksExisted % 4 == 0) {
+                                mc.thePlayer.sendQueue.addToSendQueue(
+                                    C04PacketPlayerPosition(
+                                        mc.thePlayer.posX,
+                                        mc.thePlayer.posY + 0.0011,
+                                        mc.thePlayer.posZ,
+                                        true
+                                    )
+                                )
+                                mc.thePlayer.sendQueue.addToSendQueue(
+                                    C04PacketPlayerPosition(
+                                        mc.thePlayer.posX,
+                                        mc.thePlayer.posY,
+                                        mc.thePlayer.posZ,
+                                        false
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

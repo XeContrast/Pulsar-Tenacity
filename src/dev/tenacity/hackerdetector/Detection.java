@@ -8,9 +8,10 @@ import net.minecraft.entity.player.EntityPlayer;
 @Setter
 public abstract class Detection {
 
-    private String name;
-    private Category type;
-    private long lastViolated;
+
+    public  String name;
+    public Category type;
+    public long lastViolated;
 
     public Detection(String name, Category type) {
         this.name = name;

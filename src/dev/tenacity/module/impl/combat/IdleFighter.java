@@ -65,9 +65,9 @@ public final class IdleFighter extends Module {
 
                 if (mc.thePlayer.getDistanceToEntity(target) <= reach.getValue() && attackTimer.hasTimeElapsed(1000 / MathUtils.getRandomInRange(minCPS.getValue(), maxCPS.getValue()))) {
                     AttackEvent attackEvent = new AttackEvent(target);
-                    Tenacity.INSTANCE.getEventProtocol().handleEvent(attackEvent);
+                    Tenacity.INSTANCE.eventProtocol.handleEvent(attackEvent);
 
-                    if (!attackEvent.isCancelled()) {
+                    if (!attackEvent.cancelled) {
                         AttackOrder.sendFixedAttack(mc.thePlayer, target);
                     }
                     attackTimer.reset();

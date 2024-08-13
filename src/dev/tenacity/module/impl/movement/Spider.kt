@@ -1,32 +1,24 @@
-package dev.tenacity.module.impl.movement;
+package dev.tenacity.module.impl.movement
 
-import dev.tenacity.event.impl.player.MotionEvent;
-import dev.tenacity.module.Category;
-import dev.tenacity.module.Module;
-import dev.tenacity.module.settings.impl.ModeSetting;
+import dev.tenacity.event.impl.player.MotionEvent
+import dev.tenacity.module.Category
+import dev.tenacity.module.Module
+import dev.tenacity.module.settings.impl.ModeSetting
 
-public final class Spider extends Module {
+class Spider : Module("Spider", Category.MOVEMENT, "Climbs you up walls like a spider") {
+    private val mode = ModeSetting("Mode", "Vanilla", "Vanilla", "Verus")
 
-    private final ModeSetting mode = new ModeSetting("Mode", "Vanilla", "Vanilla", "Verus");
-
-    public Spider() {
-        super("Spider", Category.MOVEMENT, "Climbs you up walls like a spider");
-        addSettings(mode);
+    init {
+        addSettings(mode)
     }
 
-    @Override
-    public void onMotionEvent(MotionEvent event) {
-        setSuffix(mode.getMode());
-        if(mc.thePlayer.isCollidedHorizontally) {
-            if(!mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically) return;
-            switch(mode.getMode()) {
-                case "Vanilla":
-                    mc.thePlayer.jump();
-                    break;
-                case "Verus":
-                    if(mc.thePlayer.ticksExisted % 3 == 0)
-                        mc.thePlayer.motionY = 0.42f;
-                    break;
+    override fun onMotionEvent(event: MotionEvent) {
+        this.suffix = mode.mode
+        if (mc.thePlayer.isCollidedHorizontally) {
+            if (!mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically) return
+            when (mode.mode) {
+                "Vanilla" -> mc.thePlayer.jump()
+                "Verus" -> if (mc.thePlayer.ticksExisted % 3 == 0) mc.thePlayer.motionY = 0.42
             }
         }
     }
