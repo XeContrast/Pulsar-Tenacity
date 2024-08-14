@@ -36,11 +36,11 @@ public class HackerDetector extends Module {
                 EntityPlayer entityPlayer = (EntityPlayer) entity;
                 if(entityPlayer != mc.thePlayer) {
                     for(Detection d : detectionManager.getDetections()) {
-                        if(detections.getSetting(d.getName()).isEnabled()) {
-                            if(d.runCheck(entityPlayer) && System.currentTimeMillis() > d.getLastViolated() + 500) {
-                                NotificationManager.post(NotificationType.WARNING, entityPlayer.getName(), "has flagged " + d.getName() + " | " + EnumChatFormatting.BOLD + entityPlayer.VL);
+                        if(detections.getSetting(d.name).isEnabled()) {
+                            if(d.runCheck(entityPlayer) && System.currentTimeMillis() > d.lastViolated + 500) {
+                                NotificationManager.post(NotificationType.WARNING, entityPlayer.getName(), "has flagged " + d.name + " | " + EnumChatFormatting.BOLD + entityPlayer.VL);
                                 entityPlayer.VL++;
-                                d.setLastViolated(System.currentTimeMillis());
+                                d.lastViolated = System.currentTimeMillis();
                             }
                         }
                     }

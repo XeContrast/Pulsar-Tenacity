@@ -34,8 +34,8 @@ public class Module extends ListenerAdapter implements Utils {
     @SerializedName("name")
     private final String name;
     private final String description;
-    private final Category category;
-    private final CopyOnWriteArrayList<Setting> settingsList = new CopyOnWriteArrayList<>();
+    public final Category category;
+    public final CopyOnWriteArrayList<Setting> settingsList = new CopyOnWriteArrayList<>();
     public String suffix;
     private String author = "";
 
@@ -137,15 +137,15 @@ public class Module extends ListenerAdapter implements Utils {
 
 
     public void onEnable() {
-        Tenacity.INSTANCE.getEventProtocol().register(this);
+        Tenacity.INSTANCE.eventProtocol.register(this);
     }
 
     public void onDisable() {
         if (this instanceof GlowESP) {
             GlowESP.fadeIn.setDirection(Direction.BACKWARDS);
-            Multithreading.schedule(() -> Tenacity.INSTANCE.getEventProtocol().unregister(this), 250, TimeUnit.MILLISECONDS);
+            Multithreading.schedule(() -> Tenacity.INSTANCE.eventProtocol.unregister(this), 250, TimeUnit.MILLISECONDS);
         } else {
-            Tenacity.INSTANCE.getEventProtocol().unregister(this);
+            Tenacity.INSTANCE.eventProtocol.unregister(this);
         }
     }
 

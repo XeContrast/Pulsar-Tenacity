@@ -29,6 +29,7 @@ import net.minecraft.util.Vec3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ChestStealer extends Module {
 
@@ -59,8 +60,8 @@ public class ChestStealer extends Module {
     @Override
     public void onMotionEvent(MotionEvent e) {
         if (e.isPre()) {
-            setSuffix(smart.isEnabled() ? "Smart" : null);
-            if (invManager == null) invManager = Tenacity.INSTANCE.getModuleCollection().getModule(InvManager.class);
+            this.suffix = (smart.isEnabled() ? "Smart" : null);
+            if (invManager == null) invManager = Tenacity.INSTANCE.moduleCollection.getModule(InvManager.class);
             if (aura.isEnabled()) {
                 final int radius = auraRange.getValue().intValue();
                 for (int x = -radius; x < radius; x++) {
@@ -71,7 +72,7 @@ public class ChestStealer extends Module {
                                 if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, EnumFacing.UP, new Vec3(pos))) {
                                     mc.thePlayer.swingItem();
                                     final float[] rotations = RotationUtils.getFacingRotations2(pos.getX(), pos.getY(), pos.getZ());
-                                    e.setRotations(rotations[0], rotations[1]);
+                                    e.setRotations(Objects.requireNonNull(rotations)[0], rotations[1]);
                                     RotationUtils.setVisualRotations(rotations[0], rotations[1]);
                                     openedChests.add(pos);
                                 }

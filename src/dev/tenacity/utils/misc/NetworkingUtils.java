@@ -15,6 +15,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 
 public class NetworkingUtils implements Utils {
 
@@ -71,22 +73,22 @@ public class NetworkingUtils implements Utils {
         if (!bypassed) {
             TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        public X509Certificate[] getAcceptedIssuers() {
                             return null;
                         }
 
                         public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
+                                X509Certificate[] certs, String authType) {
                         }
 
                         public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
+                                X509Certificate[] certs, String authType) {
                         }
                     }
             };
             try {
                 SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                sc.init(null, trustAllCerts, new SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             } catch (Exception ignored) {
             }
@@ -97,7 +99,7 @@ public class NetworkingUtils implements Utils {
     @Getter
     @AllArgsConstructor
     public static class HttpResponse {
-        private final String content;
-        private final int response;
+        public String content;
+        public int response;
     }
 }

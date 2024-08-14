@@ -33,7 +33,7 @@ public class ModuleCollection {
     }
 
     public List<Module> getModulesInCategory(Category c) {
-        return this.modules.values().stream().filter(m -> m.getCategory() == c).collect(Collectors.toList());
+        return this.modules.values().stream().filter(m -> m.category == c).collect(Collectors.toList());
     }
 
     public Module get(Class<? extends Module> mod) {
@@ -61,7 +61,7 @@ public class ModuleCollection {
     }
 
     public final List<Module> getArraylistModules(ArrayListMod arraylistMod, List<Module> modules) {
-        return modules.stream().filter(module -> module.isEnabled() && !(arraylistMod.importantModules.isEnabled() && module.getCategory().equals(Category.RENDER))).collect(Collectors.toList());
+        return modules.stream().filter(module -> module.isEnabled() && !(arraylistMod.importantModules.isEnabled() && module.category.equals(Category.RENDER))).collect(Collectors.toList());
     }
 
 

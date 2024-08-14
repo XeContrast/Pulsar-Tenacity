@@ -29,14 +29,12 @@ public final class Jesus extends Module {
 
     @Override
     public void onMotionEvent(MotionEvent event) {
-        setSuffix(mode.getMode());
+        this.suffix = mode.getMode();
         if(event.isPre()) {
             if(shouldJesus) {
-                switch(mode.getMode()) {
-                    case "Verus":
-                        if(mc.thePlayer.ticksExisted % 5 == 0)
-                            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.1, mc.thePlayer.posZ);
-                        break;
+                if (mode.getMode().equals("Verus")) {
+                    if (mc.thePlayer.ticksExisted % 5 == 0)
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.1, mc.thePlayer.posZ);
                 }
             }
             shouldJesus = false;
