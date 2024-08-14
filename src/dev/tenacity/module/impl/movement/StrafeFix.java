@@ -15,12 +15,15 @@
  */
 package dev.tenacity.module.impl.movement;
 
+import dev.tenacity.event.impl.player.MotionEvent;
 import dev.tenacity.event.impl.player.MovementInputUpdateEvent;
 import dev.tenacity.module.Category;
 import dev.tenacity.module.Module;
 import net.minecraft.util.MathHelper;
 
 public class StrafeFix extends Module {
+    private float fixedYaw = 0f;
+
     public StrafeFix() {
         super("StrafeFix", Category.MOVEMENT, "Move Correction");
     }
@@ -40,7 +43,7 @@ public class StrafeFix extends Module {
         if (disabled) return;
         final float forward = event.getMoveForward();
         final float strafe = event.getMoveStrafe();
-        final float yaw = mc.thePlayer.getRotationYawHead();
+        final float yaw = fixedYaw = mc.thePlayer.getRotationYawHead();
         fixed = true;
 
         final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(mc.thePlayer.rotationYaw, forward, strafe)));
@@ -88,4 +91,14 @@ public class StrafeFix extends Module {
 
         return Math.toRadians(rotationYaw);
     }
+
+    @Override
+    public void onMotionEvent(MotionEvent event) {
+        if (fixed) {
+            event.setYaw(fixedYaw);
+        }
+
+    }
+
+
 }

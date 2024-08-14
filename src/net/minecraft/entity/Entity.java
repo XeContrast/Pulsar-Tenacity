@@ -1,10 +1,10 @@
 package net.minecraft.entity;
 
 import dev.tenacity.Tenacity;
-import dev.tenacity.module.impl.movement.Flight;
 import dev.tenacity.event.impl.player.PlayerMoveUpdateEvent;
 import dev.tenacity.event.impl.player.SafeWalkEvent;
 import dev.tenacity.event.impl.player.StepConfirmEvent;
+import dev.tenacity.module.impl.movement.Flight;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -75,50 +75,62 @@ public abstract class Entity implements ICommandSender {
     public double getPrevPosX() {
         return prevPosX;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getPrevPosY() {
         return prevPosY;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getPrevPosZ() {
         return prevPosZ;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getPosX() {
         return posX;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getPosY() {
         return posY;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getPosZ() {
         return posZ;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getMotionX() {
         return motionX;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getMotionY() {
         return motionY;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public double getMotionZ() {
         return motionZ;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public boolean isOnGround() {
         return onGround;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public boolean isCollidedHorizontally() {
         return isCollidedHorizontally;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public boolean isCollidedVertically() {
         return isCollidedVertically;
     }
+
     @Exclude(Strategy.NAME_REMAPPING)
     public boolean isCollided() {
         return isCollided;
@@ -655,7 +667,7 @@ public abstract class Entity implements ICommandSender {
             double d5 = z;
 
             SafeWalkEvent safeWalkEvent = new SafeWalkEvent();
-            Tenacity.INSTANCE.getEventProtocol().handleEvent(safeWalkEvent);
+            Tenacity.INSTANCE.eventProtocol.handleEvent(safeWalkEvent);
 
             boolean flag = this.onGround && (this.isSneaking() || safeWalkEvent.isSafe()) && this instanceof EntityPlayer;
 
@@ -805,7 +817,7 @@ public abstract class Entity implements ICommandSender {
                     z = d8;
                     this.setEntityBoundingBox(axisalignedbb3);
                 } else {
-                    Tenacity.INSTANCE.getEventProtocol().handleEvent(new StepConfirmEvent());
+                    Tenacity.INSTANCE.eventProtocol.handleEvent(new StepConfirmEvent());
                 }
             }
 
@@ -951,7 +963,7 @@ public abstract class Entity implements ICommandSender {
     }
 
     protected void playStepSound(BlockPos pos, Block blockIn) {
-        if(Flight.hiddenBlocks.contains(pos)){
+        if (Flight.hiddenBlocks.contains(pos)) {
             return;
         }
         Block.SoundType block$soundtype = blockIn.stepSound;
@@ -1139,7 +1151,7 @@ public abstract class Entity implements ICommandSender {
             float f = BlockLiquid.getLiquidHeightPercent(iblockstate.getBlock().getMetaFromState(iblockstate)) - 0.11111111F;
             float f1 = (float) (blockpos.getY() + 1) - f;
             boolean flag = d0 < (double) f1;
-            return !flag && this instanceof EntityPlayer ? false : flag;
+            return (flag || !(this instanceof EntityPlayer)) && flag;
         } else {
             return false;
         }
@@ -1155,27 +1167,23 @@ public abstract class Entity implements ICommandSender {
     public void moveFlying(float strafe, float forward, float friction) {
         PlayerMoveUpdateEvent playerMovementEvent = new PlayerMoveUpdateEvent(strafe, forward, friction, this.rotationYaw, this.rotationPitch);
         if (this instanceof EntityPlayerSP) {
-            Tenacity.INSTANCE.getEventProtocol().handleEvent(playerMovementEvent);
+            Tenacity.INSTANCE.eventProtocol.handleEvent(playerMovementEvent);
         }
-        if (playerMovementEvent.isCancelled()) return;
+        if (playerMovementEvent.cancelled) return;
+        strafe = playerMovementEvent.strafe;
+        forward = playerMovementEvent.forward;
+        friction = playerMovementEvent.friction;
 
-        strafe = playerMovementEvent.getStrafe();
-        forward = playerMovementEvent.getForward();
-        friction = playerMovementEvent.getFriction();
         float f = strafe * strafe + forward * forward;
-
         if (f >= 1.0E-4F) {
             f = MathHelper.sqrt_float(f);
-
-            if (f < 1.0F) {
-                f = 1.0F;
-            }
+            if (f < 1.0F) f = 1.0F;
 
             f = friction / f;
             strafe = strafe * f;
             forward = forward * f;
-            float f1 = MathHelper.sin(playerMovementEvent.getYaw() * (float) Math.PI / 180.0F);
-            float f2 = MathHelper.cos(playerMovementEvent.getYaw() * (float) Math.PI / 180.0F);
+            float f1 = MathHelper.sin(playerMovementEvent.yaw * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(playerMovementEvent.yaw * (float) Math.PI / 180.0F);
             this.motionX += strafe * f2 - forward * f1;
             this.motionZ += forward * f2 + strafe * f1;
         }
@@ -1506,7 +1514,7 @@ public abstract class Entity implements ICommandSender {
             tagCompund.setLong("UUIDMost", this.getUniqueID().getMostSignificantBits());
             tagCompund.setLong("UUIDLeast", this.getUniqueID().getLeastSignificantBits());
 
-            if (this.getCustomNameTag() != null && this.getCustomNameTag().length() > 0) {
+            if (this.getCustomNameTag() != null && !this.getCustomNameTag().isEmpty()) {
                 tagCompund.setString("CustomName", this.getCustomNameTag());
                 tagCompund.setBoolean("CustomNameVisible", this.getAlwaysRenderNameTag());
             }
@@ -1582,7 +1590,7 @@ public abstract class Entity implements ICommandSender {
             this.setPosition(this.posX, this.posY, this.posZ);
             this.setRotation(this.rotationYaw, this.rotationPitch);
 
-            if (tagCompund.hasKey("CustomName", 8) && tagCompund.getString("CustomName").length() > 0) {
+            if (tagCompund.hasKey("CustomName", 8) && !tagCompund.getString("CustomName").isEmpty()) {
                 this.setCustomNameTag(tagCompund.getString("CustomName"));
             }
 
@@ -1740,7 +1748,6 @@ public abstract class Entity implements ICommandSender {
                 this.entityRiderYawDelta += this.ridingEntity.rotationYaw - this.ridingEntity.prevRotationYaw;
 
                 for (this.entityRiderPitchDelta += this.ridingEntity.rotationPitch - this.ridingEntity.prevRotationPitch; this.entityRiderYawDelta >= 180.0D; this.entityRiderYawDelta -= 360.0D) {
-                    ;
                 }
 
                 while (this.entityRiderYawDelta < -180.0D) {
@@ -1980,7 +1987,7 @@ public abstract class Entity implements ICommandSender {
      * For EntityLivingBase subclasses, returning false when invisible will render the entity semitransparent.
      */
     public boolean isInvisibleToPlayer(EntityPlayer player) {
-        return player.isSpectator() ? false : this.isInvisible();
+        return !player.isSpectator() && this.isInvisible();
     }
 
     public void setInvisible(boolean invisible) {
@@ -2333,7 +2340,7 @@ public abstract class Entity implements ICommandSender {
      * Returns true if this thing is named
      */
     public boolean hasCustomName() {
-        return this.dataWatcher.getWatchableObjectString(2).length() > 0;
+        return !this.dataWatcher.getWatchableObjectString(2).isEmpty();
     }
 
     public void setAlwaysRenderNameTag(boolean alwaysRenderNameTag) {
