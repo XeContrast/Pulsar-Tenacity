@@ -46,9 +46,8 @@ object ScaffoldUtils : Utils {
                         yLevel - (if (Scaffold.isDownwards) 1 else 0)
                     } else {
                         if (Scaffold.keepYMode.`is`("WatchDog")) {
-                            if (Scaffold.up) {
+                            if (mc.thePlayer.motionY in 0.1..0.2) {
                                 yLevel + 1
-                                mc.thePlayer.posY - 0.6
                             } else {
                                 yLevel
                             }
