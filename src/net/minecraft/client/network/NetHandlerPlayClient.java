@@ -6,10 +6,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mojang.authlib.GameProfile;
 import dev.tenacity.Tenacity;
-import dev.tenacity.module.impl.movement.Flight;
 import dev.tenacity.event.impl.player.ChatReceivedEvent;
+import dev.tenacity.module.impl.movement.Flight;
 import dev.tenacity.utils.misc.Enhancements;
-import dev.tenacity.utils.player.ChatUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.client.ClientBrandRetriever;
@@ -30,7 +29,10 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.*;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.BaseAttributeMap;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.*;
 import net.minecraft.entity.monster.EntityGuardian;
@@ -633,8 +635,8 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
 
         ChatReceivedEvent e = new ChatReceivedEvent(packetIn.getType(), packetIn.getChatComponent());
 
-        Tenacity.INSTANCE.getEventProtocol().handleEvent(e);
-        if (e.isCancelled() || e.message == null) return;
+        Tenacity.INSTANCE.eventProtocol.handleEvent(e);
+        if (e.cancelled || e.message == null) return;
 
         if (packetIn.getType() == 2) {
             this.gameController.ingameGUI.setRecordPlaying(e.message, false);
