@@ -21,6 +21,10 @@ MuFeng不死吗，我给他吗啥了
 
 Nigga rotation by tenashitty
 
+我草泥马什么时候能发布这么搞
+
+我测你么xiaozhuhou赶紧更新外挂
+
 # Dev List:
 -Xebook1
 
