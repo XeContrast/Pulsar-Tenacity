@@ -47,7 +47,7 @@ public final class LongJump extends Module {
 
     @Override
     public void onMotionEvent(MotionEvent event) {
-        setSuffix(mode.getMode());
+        this.suffix = mode.getMode();
         if(spoofY.isEnabled()) mc.thePlayer.posY = y;
         switch (mode.getMode()) {
             case "Vanilla":

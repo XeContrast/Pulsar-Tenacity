@@ -8,8 +8,8 @@ import java.io.File;
 @Getter
 public class LocalConfig {
 
-    private final String name;
-    private final File file;
+    public final String name;
+    public final File file;
 
     public LocalConfig(String name) {
         this.name = name;

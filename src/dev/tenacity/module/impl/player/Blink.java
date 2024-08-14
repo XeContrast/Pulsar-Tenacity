@@ -78,7 +78,7 @@ public final class Blink extends Module {
 
     @Override
     public void onRender3DEvent(Render3DEvent event) {
-        Tenacity.INSTANCE.getModuleCollection().getModule(Breadcrumbs.class).renderLine(path);
+        Tenacity.INSTANCE.moduleCollection.getModule(Breadcrumbs.class).renderLine(path);
     }
 
     @Override

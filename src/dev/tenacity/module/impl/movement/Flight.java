@@ -100,15 +100,13 @@ public final class Flight extends Module {
                 TargetStrafe.strafe(e, horizontalSpeed.getValue().floatValue());
                 break;
             case "Watchdog":
+            case "Packet":
                 e.setSpeed(0);
                 break;
             case "Slime":
                 if(stage < 8) {
                     e.setSpeed(0);
                 }
-                break;
-            case "Packet":
-                e.setSpeed(0);
                 break;
             case "Minemora":
                 if(!hasDamaged)
@@ -122,7 +120,7 @@ public final class Flight extends Module {
 
     @Override
     public void onMotionEvent(MotionEvent e) {
-        this.setSuffix(mode.getMode());
+        this.suffix = mode.getMode();
         if (viewBobbing.isEnabled()) {
             mc.thePlayer.cameraYaw = mc.thePlayer.cameraPitch = 0.08F;
         }
@@ -173,11 +171,9 @@ public final class Flight extends Module {
             case "Zonecraft":
                 if(e.isPre()) {
                     stage++;
-                    switch(stage) {
-                        case 1:
-                            e.setOnGround(true);
-                            MovementUtils.setSpeed(0.55);
-                            break;
+                    if (stage == 1) {
+                        e.setOnGround(true);
+                        MovementUtils.setSpeed(0.55);
                     }
 
                     mc.thePlayer.motionY = 0;
@@ -267,11 +263,9 @@ public final class Flight extends Module {
             case "Custom":
                 if(e.isPre()) {
                     stage++;
-                    switch(stage) {
-                        case 1:
-                            if(damage.isEnabled())
-                                DamageUtils.damage(DamageUtils.DamageType.valueOf(damageMode.getMode().toUpperCase()));
-                            break;
+                    if (stage == 1) {
+                        if (damage.isEnabled())
+                            DamageUtils.damage(DamageUtils.DamageType.valueOf(damageMode.getMode().toUpperCase()));
                     }
                     mc.thePlayer.motionY = motionY.getValue();
                     if(speed.isEnabled()) MovementUtils.setSpeed(speedAmount.getValue());

@@ -62,8 +62,8 @@ public class Killsults extends Module {
     private void fetch() {
         try {
             NetworkingUtils.HttpResponse res = NetworkingUtils.httpsConnection("https://raw.githubusercontent.com/Tenacity-Client/Public-Repo/main/killsults.txt");
-            if (res != null && res.getResponse() == HttpsURLConnection.HTTP_OK) {
-                Scanner scanner = new Scanner(res.getContent());
+            if (res != null && res.response == HttpsURLConnection.HTTP_OK) {
+                Scanner scanner = new Scanner(res.content);
                 while (scanner.hasNextLine()) {
                     messages.add(scanner.nextLine());
                 }

@@ -19,7 +19,7 @@ public class FastLadder extends Module {
 
     @Override
     public void onMotionEvent(MotionEvent event) {
-        this.setSuffix(mode.getMode());
+        this.suffix = mode.getMode();
         if (mc.thePlayer.isOnLadder()) {
             switch (mode.getMode()) {
                 case "Timer":

@@ -31,7 +31,7 @@ public class ConfigManager {
     public static boolean loadVisuals;
     public static File defaultConfig;
     public final File file = new File(Minecraft.getMinecraft().mcDataDir, "/TenacityCN/Configs");
-    private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
     public void collectConfigs() {
         localConfigs.clear();
@@ -49,9 +49,9 @@ public class ConfigManager {
      */
     public boolean saveConfig(String name, String content) {
         LocalConfig localConfig = new LocalConfig(name);
-        localConfig.getFile().getParentFile().mkdirs();
+        localConfig.file.getParentFile().mkdirs();
         try {
-            Files.write(localConfig.getFile().toPath(), content.getBytes(StandardCharsets.UTF_8));
+            Files.write(localConfig.file.toPath(), content.getBytes(StandardCharsets.UTF_8));
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,10 +65,10 @@ public class ConfigManager {
 
 
     public boolean delete(String configName) {
-        List<LocalConfig> configsMatch = localConfigs.stream().filter(localConfig -> localConfig.getName().equals(configName)).collect(Collectors.toList());
+        List<LocalConfig> configsMatch = localConfigs.stream().filter(localConfig -> localConfig.name.equals(configName)).collect(Collectors.toList());
         try {
             LocalConfig configToDelete = configsMatch.get(0);
-            Files.deleteIfExists(configToDelete.getFile().toPath());
+            Files.deleteIfExists(configToDelete.file.toPath());
         } catch (IOException | IndexOutOfBoundsException e) {
             e.printStackTrace();
             NotificationManager.post(NotificationType.WARNING, "Config Manager", "Failed to delete config!");
@@ -77,7 +77,7 @@ public class ConfigManager {
         return true;
     }
 
-    public void saveDefaultConfig() {
+    public static void saveDefaultConfig() {
         defaultConfig.getParentFile().mkdirs();
         try {
             Files.write(defaultConfig.toPath(), serialize().getBytes(StandardCharsets.UTF_8));
@@ -87,11 +87,11 @@ public class ConfigManager {
         }
     }
 
-    public String serialize() {
-        for (Module module : Tenacity.INSTANCE.getModuleCollection().getModules()) {
-            if (module.getCategory().equals(Category.SCRIPTS)) continue;
+    public static String serialize() {
+        for (Module module : Tenacity.INSTANCE.moduleCollection.getModules()) {
+            if (module.category.equals(Category.SCRIPTS)) continue;
             List<ConfigSetting> settings = new ArrayList<>();
-            for (Setting setting : module.getSettingsList()) {
+            for (Setting setting : module.settingsList) {
                 ConfigSetting cfgSetting = new ConfigSetting(null, null);
                 cfgSetting.name = setting.name;
                 cfgSetting.value = setting.getConfigValue();
@@ -99,7 +99,7 @@ public class ConfigManager {
             }
             module.cfgSettings = settings.toArray(new ConfigSetting[0]);
         }
-        return gson.toJson(Tenacity.INSTANCE.getModuleCollection().getModules());
+        return gson.toJson(Tenacity.INSTANCE.moduleCollection.getModules());
     }
 
     public String readConfigData(Path configPath) {
@@ -118,11 +118,11 @@ public class ConfigManager {
     public boolean loadConfig(String data, boolean keybinds) {
         Module[] modules = gson.fromJson(data, Module[].class);
 
-        for (Module module : Tenacity.INSTANCE.getModuleCollection().getModules()) {
+        for (Module module : Tenacity.INSTANCE.moduleCollection.getModules()) {
             if (!keybinds) {
-                if (!loadVisuals && module.getCategory().equals(Category.RENDER)) continue;
+                if (!loadVisuals && module.category.equals(Category.RENDER)) continue;
             }
-            if (module.getCategory().equals(Category.SCRIPTS)) continue;
+            if (module.category.equals(Category.SCRIPTS)) continue;
 
             for (Module configModule : modules) {
                 if (module.getName().equalsIgnoreCase(configModule.getName())) {
@@ -130,7 +130,7 @@ public class ConfigManager {
                         if (module.isEnabled() != configModule.isEnabled()) {
                             module.toggleSilent();
                         }
-                        for (Setting setting : module.getSettingsList()) {
+                        for (Setting setting : module.settingsList) {
                             for (ConfigSetting cfgSetting : configModule.cfgSettings) {
                                 if (setting.name.equals(cfgSetting.name)) {
                                     if (setting instanceof KeybindSetting) {
