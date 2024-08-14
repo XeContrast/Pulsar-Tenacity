@@ -73,31 +73,13 @@ class Criticals : Module("Criticals", Category.COMBAT, "Crit attacks") {
 
             "BlocksMC" -> {
                 if (KillAura.attacking && !Step.isStepping) {
-                when (bmcmode.mode) {
-                        "Motion" -> {
-                            mc.thePlayer.sendQueue.addToSendQueue(
-                                C04PacketPlayerPosition(
-                                    mc.thePlayer.posX,
-                                    mc.thePlayer.posY + 0.001091981,
-                                    mc.thePlayer.posZ,
-                                    true
-                                )
-                            )
-                            mc.thePlayer.sendQueue.addToSendQueue(
-                                C04PacketPlayerPosition(
-                                    mc.thePlayer.posX,
-                                    mc.thePlayer.posY,
-                                    mc.thePlayer.posZ,
-                                    false
-                                )
-                            )
-                        }
-                        "Packet" -> {
-                            if (mc.thePlayer.ticksExisted % 4 == 0) {
+                    if (KillAura.target != null && KillAura.target!!.hurtTime >= delay.value.toInt()) {
+                        when (bmcmode.mode) {
+                            "Motion" -> {
                                 mc.thePlayer.sendQueue.addToSendQueue(
                                     C04PacketPlayerPosition(
                                         mc.thePlayer.posX,
-                                        mc.thePlayer.posY + 0.0011,
+                                        mc.thePlayer.posY + 0.001091981,
                                         mc.thePlayer.posZ,
                                         true
                                     )
@@ -110,6 +92,27 @@ class Criticals : Module("Criticals", Category.COMBAT, "Crit attacks") {
                                         false
                                     )
                                 )
+                            }
+
+                            "Packet" -> {
+                                if (mc.thePlayer.ticksExisted % 4 == 0) {
+                                    mc.thePlayer.sendQueue.addToSendQueue(
+                                        C04PacketPlayerPosition(
+                                            mc.thePlayer.posX,
+                                            mc.thePlayer.posY + 0.0011,
+                                            mc.thePlayer.posZ,
+                                            true
+                                        )
+                                    )
+                                    mc.thePlayer.sendQueue.addToSendQueue(
+                                        C04PacketPlayerPosition(
+                                            mc.thePlayer.posX,
+                                            mc.thePlayer.posY,
+                                            mc.thePlayer.posZ,
+                                            false
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
