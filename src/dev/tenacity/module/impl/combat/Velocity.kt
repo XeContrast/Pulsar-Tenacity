@@ -3,6 +3,7 @@ package dev.tenacity.module.impl.combat
 import dev.tenacity.event.impl.game.WorldEvent
 import dev.tenacity.event.impl.network.PacketReceiveEvent
 import dev.tenacity.event.impl.network.PacketSendEvent
+import dev.tenacity.event.impl.player.UpdateEvent
 import dev.tenacity.module.Category
 import dev.tenacity.module.Module
 import dev.tenacity.module.settings.Setting
@@ -19,18 +20,18 @@ import net.minecraft.network.play.server.S19PacketEntityStatus
 import net.minecraft.network.play.server.S27PacketExplosion
 
 class Velocity : Module("Velocity", Category.COMBAT, "Reduces your knockback") {
-    private val mode = ModeSetting("Mode", "Packet", "Packet","WatchDog", "Matrix", "Tick", "Stack", "C0F Cancel")
+    private val mode = ModeSetting("Mode", "Packet", "Packet","WatchDog", "Matrix", "Tick", "Stack", "C0F Cancel","IntaveReduce")
     private val horizontal = NumberSetting("Horizontal", 0.0, 100.0, 0.0, 1.0)
     private val vertical = NumberSetting("Vertical", 0.0, 100.0, 0.0, 1.0)
     private val chance = NumberSetting("Chance", 100.0, 100.0, 0.0, 1.0)
     private val onlyWhileMoving = BooleanSetting("Only while moving", false)
     private val staffCheck = BooleanSetting("Staff check", false)
-
+    var jump = false
     private var lastDamageTimestamp: Long = 0
     private var lastAlertTimestamp: Long = 0
     private var cancel = false
     private var stack = 0
-
+    var BoolTag = false
     init {
         Setting.addParent(mode, { m: ModeSetting -> m.`is`("Packet") }, horizontal, vertical, staffCheck)
         this.addSettings(mode, horizontal, vertical, chance, onlyWhileMoving, staffCheck)
@@ -122,6 +123,7 @@ class Velocity : Module("Velocity", Category.COMBAT, "Reduces your knockback") {
                     s12.motionY = (s12.motionY * (100 / 100.0)).toInt()
                 }
             }
+
         }
     }
 
@@ -142,5 +144,23 @@ class Velocity : Module("Velocity", Category.COMBAT, "Reduces your knockback") {
             return true
         }
         return false
+    }
+    private fun onupdate(event: UpdateEvent){
+        if (mc.thePlayer.hurtTime >= 1&&mc.thePlayer.onGround) {
+            mc.gameSettings.keyBindJump.pressed = true
+            jump = true
+        }else if (jump){
+            mc.gameSettings.keyBindJump.pressed = false
+            jump = false
+        }
+        if (mode.`is`("IntaveReduce")) {
+            if (mc.thePlayer.onGround) {
+                BoolTag = true
+                mc.thePlayer.motionX *= 0.66
+                mc.thePlayer.motionZ *= 0.66
+            }
+        }else{
+            BoolTag = false
+        }
     }
 }
