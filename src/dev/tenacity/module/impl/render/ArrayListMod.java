@@ -1,6 +1,5 @@
 package dev.tenacity.module.impl.render;
 
-import dev.tenacity.utils.tuples.Pair;
 import dev.tenacity.Tenacity;
 import dev.tenacity.event.impl.render.Render2DEvent;
 import dev.tenacity.event.impl.render.ShaderEvent;
@@ -18,6 +17,7 @@ import dev.tenacity.utils.font.AbstractFontRenderer;
 import dev.tenacity.utils.objects.Dragging;
 import dev.tenacity.utils.render.ColorUtil;
 import dev.tenacity.utils.render.RenderUtil;
+import dev.tenacity.utils.tuples.Pair;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.StringUtils;
@@ -59,13 +59,13 @@ public class ArrayListMod extends Module {
 
     public void getModulesAndSort() {
         if (modules == null || ModuleCollection.reloadModules) {
-            List<Class<? extends Module>> hiddenModules = Tenacity.INSTANCE.getModuleCollection().getHiddenModules();
-            List<Module> moduleList = Tenacity.INSTANCE.getModuleCollection().getModules();
+            List<Class<? extends Module>> hiddenModules = Tenacity.INSTANCE.moduleCollection.getHiddenModules();
+            List<Module> moduleList = Tenacity.INSTANCE.moduleCollection.getModules();
             moduleList.removeIf(module -> hiddenModules.stream().anyMatch(moduleClass -> moduleClass == module.getClass()));
             modules = moduleList;
         }
         modules.sort(Comparator.<Module>comparingDouble(m -> {
-            String name = HUDMod.get(m.getName() + (m.hasMode() ? " " + m.getSuffix() : ""));
+            String name = HUDMod.get(m.getName() + (m.hasMode() ? " " + m.suffix : ""));
             return font.getStringWidth(applyText(name));
         }).reversed());
     }
@@ -81,11 +81,11 @@ public class ArrayListMod extends Module {
         ScaledResolution sr = new ScaledResolution(mc);
         int count = 0;
         for (Module module : modules) {
-            if (importantModules.isEnabled() && module.getCategory() == Category.RENDER) continue;
+            if (importantModules.isEnabled() && module.category == Category.RENDER) continue;
             final Animation moduleAnimation = module.getAnimation();
             if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
 
-            String displayText = HUDMod.get(module.getName() + (module.hasMode() ? " §7" + module.getSuffix() : ""));
+            String displayText = HUDMod.get(module.getName() + (module.hasMode() ? " §7" + module.suffix : ""));
             displayText = applyText(displayText);
             float textWidth = font.getStringWidth(displayText);
 
@@ -108,7 +108,7 @@ public class ArrayListMod extends Module {
                     break;
                 case "Scale in":
                     if (!moduleAnimation.isDone()) {
-                        RenderUtil.scaleStart((float) (x + font.getStringWidth(displayText) / 2f), (float) (y + heightVal / 2 - font.getHeight() / 2f), (float) moduleAnimation.getOutput().floatValue());
+                        RenderUtil.scaleStart(x + font.getStringWidth(displayText) / 2f, y + heightVal / 2 - font.getHeight() / 2f, moduleAnimation.getOutput().floatValue());
                     }
                     scaleIn = true;
                     break;
@@ -141,8 +141,6 @@ public class ArrayListMod extends Module {
                 }
 
                 switch (rectangle.getMode()) {
-                    default:
-                        break;
                     case "Top":
                         if (count == 0) {
                             Gui.drawRect2(x - 2, y - 1, textWidth + 5 - (offset2), 9, rectangleColor);
@@ -156,6 +154,8 @@ public class ArrayListMod extends Module {
                         }
                         break;
                     case "Outline":
+                        break;
+                    default:
                         break;
                 }
             }
@@ -184,7 +184,7 @@ public class ArrayListMod extends Module {
         ScaledResolution sr = new ScaledResolution(mc);
         int count = 0;
         for (Module module : modules) {
-            if (importantModules.isEnabled() && module.getCategory() == Category.RENDER) continue;
+            if (importantModules.isEnabled() && module.category == Category.RENDER) continue;
             final Animation moduleAnimation = module.getAnimation();
 
             moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
@@ -192,7 +192,7 @@ public class ArrayListMod extends Module {
             if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
 
 
-            String displayText = HUDMod.get(module.getName() + (module.hasMode() ? (module.getCategory().equals(Category.SCRIPTS) ? " §c" : " §7") + module.getSuffix() : ""));
+            String displayText = HUDMod.get(module.getName() + (module.hasMode() ? (module.category.equals(Category.SCRIPTS) ? " §c" : " §7") + module.suffix : ""));
             displayText = applyText(displayText);
             float textWidth = font.getStringWidth(displayText);
 
@@ -224,9 +224,9 @@ public class ArrayListMod extends Module {
                     break;
                 case "Scale in":
                     if (!moduleAnimation.isDone()) {
-                        RenderUtil.scaleStart(x + font.getStringWidth(displayText) / 2f, y + heightVal / 2 - font.getHeight() / 2f, (float) moduleAnimation.getOutput().floatValue());
+                        RenderUtil.scaleStart(x + font.getStringWidth(displayText) / 2f, y + heightVal / 2 - font.getHeight() / 2f, moduleAnimation.getOutput().floatValue());
                     }
-                    alphaAnimation = (float) moduleAnimation.getOutput().floatValue();
+                    alphaAnimation = moduleAnimation.getOutput().floatValue();
                     break;
             }
 
@@ -250,8 +250,6 @@ public class ArrayListMod extends Module {
 
             float offset = minecraftFont.isEnabled() ? 1 : 0;
             switch (rectangle.getMode()) {
-                default:
-                    break;
                 case "Top":
                     if (count == 0) {
                         Gui.drawRect2(x - 2, y - 1, textWidth + 5 - offset, 1, textcolor.getRGB());
@@ -266,7 +264,7 @@ public class ArrayListMod extends Module {
                     break;
                 case "Outline":
                     if (count != 0) {
-                        String modText = applyText(HUDMod.get(lastModule.getName() + (lastModule.hasMode() ? " " + lastModule.getSuffix() : "")));
+                        String modText = applyText(HUDMod.get(lastModule.getName() + (lastModule.hasMode() ? " " + lastModule.suffix : "")));
                         float texWidth = font.getStringWidth(modText) - textWidth;
                         //Draws the difference of width rect and also the rect on the side of the text
                         if (flip) {
@@ -298,6 +296,8 @@ public class ArrayListMod extends Module {
                     }
 
 
+                    break;
+                default:
                     break;
             }
 

@@ -47,7 +47,7 @@ public class ProtectedLaunch {
     public static void start() {
         // Setup Intent API access
         Tenacity.INSTANCE.setIntentAccount(GetUserInfo.loginFailure);
-        Tenacity.INSTANCE.setModuleCollection(new ModuleCollection());
+        Tenacity.INSTANCE.moduleCollection = (new ModuleCollection());
 
         // Combat
         modules.put(KillAura.class, new KillAura());
@@ -151,7 +151,7 @@ public class ProtectedLaunch {
         modules.put(Chams.class, new Chams());
         modules.put(BrightPlayers.class, new BrightPlayers());
 
-        Tenacity.INSTANCE.getModuleCollection().setModules(modules);
+        Tenacity.INSTANCE.moduleCollection.setModules(modules);
 
         Theme.init();
 
@@ -167,7 +167,7 @@ public class ProtectedLaunch {
                 new LoadCommand(), new ToggleCommand()
         ));
         Tenacity.INSTANCE.setCommandHandler(commandHandler);
-        Tenacity.INSTANCE.getEventProtocol().register(new BackgroundProcess());
+        Tenacity.INSTANCE.eventProtocol.register(new BackgroundProcess());
 
         Tenacity.INSTANCE.setConfigManager(new ConfigManager());
         ConfigManager.defaultConfig = new File(Minecraft.getMinecraft().mcDataDir + "/Tenacity/Config.json");
