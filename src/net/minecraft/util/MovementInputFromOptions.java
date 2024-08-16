@@ -32,9 +32,8 @@ public class MovementInputFromOptions extends MovementInput {
             --this.moveStrafe;
         }
         final MovementInputUpdateEvent event = new MovementInputUpdateEvent(moveStrafe, moveForward, jump, sneak);
-
         Tenacity.INSTANCE.eventProtocol.handleEvent(event);
-        this.jump = this.gameSettings.keyBindJump.isKeyDown() && !(Tenacity.INSTANCE.getModuleCollection().getModule(Speed.class).shouldPreventJumping());
+        this.jump = this.gameSettings.keyBindJump.isKeyDown() && !(Tenacity.INSTANCE.moduleCollection.getModule(Speed.class).shouldPreventJumping());
         this.sneak = this.gameSettings.keyBindSneak.isKeyDown();
 
         if (this.sneak) {

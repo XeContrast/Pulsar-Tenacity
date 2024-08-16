@@ -25,7 +25,7 @@ public class StrafeFix extends Module {
     private float fixedYaw = 0f;
 
     public StrafeFix() {
-        super("StrafeFix", Category.MOVEMENT, "Move Correction");
+        super("StrafeFix", Category.MOVEMENT, "CaoDaBi");//招展恒我要操你的逼
     }
 
     boolean fixed;
@@ -39,18 +39,17 @@ public class StrafeFix extends Module {
 
     @Override
     public void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
-        fixed = false;
-        if (disabled) return;
         final float forward = event.getMoveForward();
         final float strafe = event.getMoveStrafe();
         final float yaw = fixedYaw = mc.thePlayer.getRotationYawHead();
+        fixed = false;
+        if (disabled || (forward == 0 && strafe == 0)) {
+            return;
+        }
         fixed = true;
 
         final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(mc.thePlayer.rotationYaw, forward, strafe)));
 
-        if (forward == 0 && strafe == 0) {
-            return;
-        }
 
         float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
 
@@ -79,15 +78,24 @@ public class StrafeFix extends Module {
     }
 
     private static double direction(float rotationYaw, final double moveForward, final double moveStrafing) {
-        if (moveForward < 0F) rotationYaw += 180F;
+        if (moveForward < 0F) {
+            rotationYaw += 180F;
+        }
 
         float forward = 1F;
 
-        if (moveForward < 0F) forward = -0.5F;
-        else if (moveForward > 0F) forward = 0.5F;
+        if (moveForward < 0F) {
+            forward = -0.5F;
+        } else if (moveForward > 0F) {
+            forward = 0.5F;
+        }
 
-        if (moveStrafing > 0F) rotationYaw -= 90F * forward;
-        if (moveStrafing < 0F) rotationYaw += 90F * forward;
+        if (moveStrafing > 0F) {
+            rotationYaw -= 90F * forward;
+        }
+        if (moveStrafing < 0F) {
+            rotationYaw += 90F * forward;
+        }
 
         return Math.toRadians(rotationYaw);
     }
@@ -97,8 +105,5 @@ public class StrafeFix extends Module {
         if (fixed) {
             event.setYaw(fixedYaw);
         }
-
     }
-
-
 }
